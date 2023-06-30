@@ -56,6 +56,8 @@ pub mod error;
 pub mod platform;
 pub mod secrets_manager;
 mod util;
+#[cfg(feature = "internal")]
+pub mod vault;
 pub mod wordlist;
 
 pub use client::Client;

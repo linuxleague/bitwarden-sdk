@@ -1,14 +1,19 @@
 // To parse this data:
 //
-//   import { Convert, ClientSettings, Command, ResponseForAPIKeyLoginResponse, ResponseForPasswordLoginResponse, ResponseForSecretIdentifiersResponse, ResponseForSecretResponse, ResponseForSecretsDeleteResponse } from "./file";
+//   import { Convert, ClientSettings, Command, ResponseForAPIKeyLoginResponse, ResponseForCipherListResponse, ResponseForCipherView, ResponseForFolderResponse, ResponseForPasswordLoginResponse, ResponseForSecretIdentifiersResponse, ResponseForSecretResponse, ResponseForSecretsDeleteResponse, ResponseForSyncResponse, ResponseForUserAPIKeyResponse } from "./file";
 //
 //   const clientSettings = Convert.toClientSettings(json);
 //   const command = Convert.toCommand(json);
 //   const responseForAPIKeyLoginResponse = Convert.toResponseForAPIKeyLoginResponse(json);
+//   const responseForCipherListResponse = Convert.toResponseForCipherListResponse(json);
+//   const responseForCipherView = Convert.toResponseForCipherView(json);
+//   const responseForFolderResponse = Convert.toResponseForFolderResponse(json);
 //   const responseForPasswordLoginResponse = Convert.toResponseForPasswordLoginResponse(json);
 //   const responseForSecretIdentifiersResponse = Convert.toResponseForSecretIdentifiersResponse(json);
 //   const responseForSecretResponse = Convert.toResponseForSecretResponse(json);
 //   const responseForSecretsDeleteResponse = Convert.toResponseForSecretsDeleteResponse(json);
+//   const responseForSyncResponse = Convert.toResponseForSyncResponse(json);
+//   const responseForUserAPIKeyResponse = Convert.toResponseForUserAPIKeyResponse(json);
 //
 // These functions will throw an error if the JSON doesn't
 // match the expected interface, even if the JSON is valid.
@@ -123,6 +128,7 @@ export interface Command {
     sync?:             SyncRequest;
     secrets?:          SecretsCommand;
     projects?:         ProjectsCommand;
+    vault?:            VaultCommand;
 }
 
 /**
@@ -361,6 +367,104 @@ export interface SyncRequest {
     excludeSubdomains?: boolean | null;
 }
 
+export interface VaultCommand {
+    folders?: FoldersCommandClass | SCommand;
+    items?:   ItemsCommandClass | SCommand;
+}
+
+/**
+ * > Requires Authentication > Requires an unlocked vault Creates a new folder with the
+ * provided data
+ *
+ * > Requires Authentication > Requires an unlocked vault and calling Sync at least once
+ * Lists all folders in the vault
+ *
+ * Returns: [FoldersResponse](bitwarden::platform::folders::FoldersResponse)
+ *
+ * > Requires Authentication > Requires an unlocked vault Updates an existing folder with
+ * the provided data given its ID
+ *
+ * > Requires Authentication > Requires an unlocked vault Deletes the folder associated with
+ * the provided ID
+ */
+export interface FoldersCommandClass {
+    create?: FolderCreateRequest;
+    get?:    FolderRequest;
+    update?: FolderUpdateRequest;
+    delete?: FolderDeleteRequest;
+}
+
+export interface FolderCreateRequest {
+    name: string;
+}
+
+export interface FolderDeleteRequest {
+    id: string;
+}
+
+export interface FolderRequest {
+    id: string;
+}
+
+export interface FolderUpdateRequest {
+    id:   string;
+    name: string;
+}
+
+/**
+ * > Requires Authentication > Requires an unlocked vault and calling Sync at least once
+ * Lists all folders in the vault
+ *
+ * Returns: [FoldersResponse](bitwarden::platform::folders::FoldersResponse)
+ *
+ * > Requires Authentication > Requires an unlocked vault and calling Sync at least once
+ * Lists all items in the vault
+ *
+ * Returns: [CipherListResponse](bitwarden::vault::cipher::CipherListResponse)
+ */
+export enum SCommand {
+    List = "list",
+}
+
+/**
+ * > Requires Authentication > Requires an unlocked vault Creates a new item with the
+ * provided data
+ *
+ * > Requires Authentication > Requires an unlocked vault and calling Sync at least once
+ * Retrieves a single item in the vault
+ *
+ * Returns: [FoldersResponse](bitwarden::platform::folders::FoldersResponse)
+ *
+ * > Requires Authentication > Requires an unlocked vault Updates an existing item with the
+ * provided data given its ID
+ *
+ * > Requires Authentication > Requires an unlocked vault Deletes the item associated with
+ * the provided ID
+ */
+export interface ItemsCommandClass {
+    create?: CipherCreateRequest;
+    get?:    CipherRequest;
+    update?: CipherUpdateRequest;
+    delete?: CipherDeleteRequest;
+}
+
+export interface CipherCreateRequest {
+    name: string;
+}
+
+export interface CipherDeleteRequest {
+    id: string;
+}
+
+export interface CipherRequest {
+    id: string;
+}
+
+export interface CipherUpdateRequest {
+    id:   string;
+    name: string;
+}
+
 export interface ResponseForAPIKeyLoginResponse {
     /**
      * The response data. Populated if `success` is true.
@@ -443,6 +547,238 @@ export interface PurpleYubiKey {
      * Whether the stored yubikey supports near field communication
      */
     nfc: boolean;
+}
+
+export interface ResponseForCipherListResponse {
+    /**
+     * The response data. Populated if `success` is true.
+     */
+    data?: CipherListResponse | null;
+    /**
+     * A message for any error that may occur. Populated if `success` is false.
+     */
+    errorMessage?: null | string;
+    /**
+     * Whether or not the SDK request succeeded.
+     */
+    success: boolean;
+}
+
+export interface CipherListResponse {
+    ciphers: CipherListView[];
+}
+
+export interface CipherListView {
+    collectionIds:   string[];
+    creationDate:    Date;
+    deletedDate?:    Date | null;
+    favorite:        boolean;
+    folderId?:       null | string;
+    id:              string;
+    name:            string;
+    organizationId?: null | string;
+    reprompt:        CipherRepromptType;
+    revisionDate:    Date;
+    subTitle?:       null | string;
+    type:            CipherType;
+}
+
+export enum CipherRepromptType {
+    None = "None",
+    Password = "Password",
+}
+
+export enum CipherType {
+    Card = "Card",
+    Identity = "Identity",
+    Login = "Login",
+    SecureNote = "SecureNote",
+}
+
+export interface ResponseForCipherView {
+    /**
+     * The response data. Populated if `success` is true.
+     */
+    data?: CipherView | null;
+    /**
+     * A message for any error that may occur. Populated if `success` is false.
+     */
+    errorMessage?: null | string;
+    /**
+     * Whether or not the SDK request succeeded.
+     */
+    success: boolean;
+}
+
+export interface CipherView {
+    attachments:     AttachmentView[];
+    card?:           CardView | null;
+    collectionIds:   string[];
+    creationDate:    Date;
+    deletedDate?:    Date | null;
+    favorite:        boolean;
+    fields:          FieldView[];
+    folderId?:       null | string;
+    id:              string;
+    identity?:       IdentityView | null;
+    login?:          LoginView | null;
+    name:            string;
+    notes:           string;
+    organizationId?: null | string;
+    passwordHistory: PasswordHistoryView[];
+    reprompt:        CipherRepromptType;
+    revisionDate:    Date;
+    type:            CipherType;
+}
+
+export interface AttachmentView {
+    fileName?: null | string;
+    id?:       null | string;
+    key?:      null | string;
+    size?:     null | string;
+    sizeName?: null | string;
+    url?:      null | string;
+}
+
+export interface CardView {
+    brand?:          null | string;
+    cardholderName?: null | string;
+    code?:           null | string;
+    expMonth?:       null | string;
+    expYear?:        null | string;
+    number?:         null | string;
+}
+
+export interface FieldView {
+    linkedId?: LinkedIDType | null;
+    name?:     null | string;
+    showCount: boolean;
+    showValue: boolean;
+    type:      FieldType;
+    value?:    null | string;
+}
+
+export interface LinkedIDType {
+    loginLinkedId?:    LoginLinkedID;
+    cardLinkedId?:     CardLinkedID;
+    identityLinkedId?: IdentityLinkedID;
+}
+
+export enum CardLinkedID {
+    Brand = "brand",
+    CardholderName = "cardholderName",
+    Code = "code",
+    ExpMonth = "expMonth",
+    ExpYear = "expYear",
+    Number = "number",
+}
+
+export enum IdentityLinkedID {
+    Address1 = "address1",
+    Address2 = "address2",
+    Address3 = "address3",
+    City = "city",
+    Company = "company",
+    Country = "country",
+    Email = "email",
+    FirstName = "firstName",
+    FullName = "fullName",
+    LastName = "lastName",
+    LicenseNumber = "licenseNumber",
+    MiddleName = "middleName",
+    PassportNumber = "passportNumber",
+    Phone = "phone",
+    PostalCode = "postalCode",
+    Ssn = "ssn",
+    State = "state",
+    Title = "title",
+    Username = "username",
+}
+
+export enum LoginLinkedID {
+    Password = "password",
+    Username = "username",
+}
+
+export enum FieldType {
+    Boolean = "boolean",
+    Hidden = "hidden",
+    Linked = "linked",
+    Text = "text",
+}
+
+export interface IdentityView {
+    address1?:       null | string;
+    address2?:       null | string;
+    address3?:       null | string;
+    city?:           null | string;
+    company?:        null | string;
+    country?:        null | string;
+    email?:          null | string;
+    firstName?:      null | string;
+    lastName?:       null | string;
+    licenseNumber?:  null | string;
+    middleName?:     null | string;
+    passportNumber?: null | string;
+    phone?:          null | string;
+    postalCode?:     null | string;
+    ssn?:            null | string;
+    state?:          null | string;
+    title?:          null | string;
+    username?:       null | string;
+}
+
+export interface LoginView {
+    autofillOnPageLoad:    boolean;
+    password:              string;
+    passwordRevisionDate?: Date | null;
+    totp?:                 null | string;
+    uris:                  LoginURIView[];
+    username:              string;
+}
+
+export interface LoginURIView {
+    match: URIMatchType;
+    uri:   string;
+}
+
+export enum URIMatchType {
+    Domain = "domain",
+    Exact = "exact",
+    Host = "host",
+    Never = "never",
+    RegularExpression = "regularExpression",
+    StartsWith = "startsWith",
+}
+
+export interface PasswordHistoryView {
+    lastUsedDate: Date;
+    password:     string;
+}
+
+export interface ResponseForFolderResponse {
+    /**
+     * The response data. Populated if `success` is true.
+     */
+    data?: FolderResponse | null;
+    /**
+     * A message for any error that may occur. Populated if `success` is false.
+     */
+    errorMessage?: null | string;
+    /**
+     * Whether or not the SDK request succeeded.
+     */
+    success: boolean;
+}
+
+export interface FolderResponse {
+    folder: FolderView;
+}
+
+export interface FolderView {
+    id:           string;
+    name:         string;
+    revisionDate: Date;
 }
 
 export interface ResponseForPasswordLoginResponse {
@@ -621,6 +957,73 @@ export interface SecretDeleteResponse {
     id:     string;
 }
 
+export interface ResponseForSyncResponse {
+    /**
+     * The response data. Populated if `success` is true.
+     */
+    data?: SyncResponse | null;
+    /**
+     * A message for any error that may occur. Populated if `success` is false.
+     */
+    errorMessage?: null | string;
+    /**
+     * Whether or not the SDK request succeeded.
+     */
+    success: boolean;
+}
+
+export interface SyncResponse {
+    /**
+     * List of ciphers accesible by the user
+     */
+    ciphers: CipherDetailsResponse[];
+    /**
+     * Data about the user, including their encryption keys and the organizations they are a
+     * part of
+     */
+    profile: ProfileResponse;
+}
+
+export interface CipherDetailsResponse {
+}
+
+/**
+ * Data about the user, including their encryption keys and the organizations they are a
+ * part of
+ */
+export interface ProfileResponse {
+    email:         string;
+    id:            string;
+    name:          string;
+    organizations: ProfileOrganizationResponse[];
+}
+
+export interface ProfileOrganizationResponse {
+    id: string;
+}
+
+export interface ResponseForUserAPIKeyResponse {
+    /**
+     * The response data. Populated if `success` is true.
+     */
+    data?: UserAPIKeyResponse | null;
+    /**
+     * A message for any error that may occur. Populated if `success` is false.
+     */
+    errorMessage?: null | string;
+    /**
+     * Whether or not the SDK request succeeded.
+     */
+    success: boolean;
+}
+
+export interface UserAPIKeyResponse {
+    /**
+     * The user's API key, which represents the client_secret portion of an oauth request.
+     */
+    apiKey: string;
+}
+
 // Converts JSON strings to/from your types
 // and asserts the results of JSON.parse at runtime
 export class Convert {
@@ -646,6 +1049,30 @@ export class Convert {
 
     public static responseForAPIKeyLoginResponseToJson(value: ResponseForAPIKeyLoginResponse): string {
         return JSON.stringify(uncast(value, r("ResponseForAPIKeyLoginResponse")), null, 2);
+    }
+
+    public static toResponseForCipherListResponse(json: string): ResponseForCipherListResponse {
+        return cast(JSON.parse(json), r("ResponseForCipherListResponse"));
+    }
+
+    public static responseForCipherListResponseToJson(value: ResponseForCipherListResponse): string {
+        return JSON.stringify(uncast(value, r("ResponseForCipherListResponse")), null, 2);
+    }
+
+    public static toResponseForCipherView(json: string): ResponseForCipherView {
+        return cast(JSON.parse(json), r("ResponseForCipherView"));
+    }
+
+    public static responseForCipherViewToJson(value: ResponseForCipherView): string {
+        return JSON.stringify(uncast(value, r("ResponseForCipherView")), null, 2);
+    }
+
+    public static toResponseForFolderResponse(json: string): ResponseForFolderResponse {
+        return cast(JSON.parse(json), r("ResponseForFolderResponse"));
+    }
+
+    public static responseForFolderResponseToJson(value: ResponseForFolderResponse): string {
+        return JSON.stringify(uncast(value, r("ResponseForFolderResponse")), null, 2);
     }
 
     public static toResponseForPasswordLoginResponse(json: string): ResponseForPasswordLoginResponse {
@@ -678,6 +1105,22 @@ export class Convert {
 
     public static responseForSecretsDeleteResponseToJson(value: ResponseForSecretsDeleteResponse): string {
         return JSON.stringify(uncast(value, r("ResponseForSecretsDeleteResponse")), null, 2);
+    }
+
+    public static toResponseForSyncResponse(json: string): ResponseForSyncResponse {
+        return cast(JSON.parse(json), r("ResponseForSyncResponse"));
+    }
+
+    public static responseForSyncResponseToJson(value: ResponseForSyncResponse): string {
+        return JSON.stringify(uncast(value, r("ResponseForSyncResponse")), null, 2);
+    }
+
+    public static toResponseForUserAPIKeyResponse(json: string): ResponseForUserAPIKeyResponse {
+        return cast(JSON.parse(json), r("ResponseForUserAPIKeyResponse"));
+    }
+
+    public static responseForUserAPIKeyResponseToJson(value: ResponseForUserAPIKeyResponse): string {
+        return JSON.stringify(uncast(value, r("ResponseForUserAPIKeyResponse")), null, 2);
     }
 }
 
@@ -849,6 +1292,7 @@ const typeMap: any = {
         { json: "sync", js: "sync", typ: u(undefined, r("SyncRequest")) },
         { json: "secrets", js: "secrets", typ: u(undefined, r("SecretsCommand")) },
         { json: "projects", js: "projects", typ: u(undefined, r("ProjectsCommand")) },
+        { json: "vault", js: "vault", typ: u(undefined, r("VaultCommand")) },
     ], false),
     "AccessTokenLoginRequest": o([
         { json: "accessToken", js: "accessToken", typ: "" },
@@ -928,6 +1372,48 @@ const typeMap: any = {
     "SyncRequest": o([
         { json: "excludeSubdomains", js: "excludeSubdomains", typ: u(undefined, u(true, null)) },
     ], false),
+    "VaultCommand": o([
+        { json: "folders", js: "folders", typ: u(undefined, u(r("FoldersCommandClass"), r("SCommand"))) },
+        { json: "items", js: "items", typ: u(undefined, u(r("ItemsCommandClass"), r("SCommand"))) },
+    ], false),
+    "FoldersCommandClass": o([
+        { json: "create", js: "create", typ: u(undefined, r("FolderCreateRequest")) },
+        { json: "get", js: "get", typ: u(undefined, r("FolderRequest")) },
+        { json: "update", js: "update", typ: u(undefined, r("FolderUpdateRequest")) },
+        { json: "delete", js: "delete", typ: u(undefined, r("FolderDeleteRequest")) },
+    ], false),
+    "FolderCreateRequest": o([
+        { json: "name", js: "name", typ: "" },
+    ], false),
+    "FolderDeleteRequest": o([
+        { json: "id", js: "id", typ: "" },
+    ], false),
+    "FolderRequest": o([
+        { json: "id", js: "id", typ: "" },
+    ], false),
+    "FolderUpdateRequest": o([
+        { json: "id", js: "id", typ: "" },
+        { json: "name", js: "name", typ: "" },
+    ], false),
+    "ItemsCommandClass": o([
+        { json: "create", js: "create", typ: u(undefined, r("CipherCreateRequest")) },
+        { json: "get", js: "get", typ: u(undefined, r("CipherRequest")) },
+        { json: "update", js: "update", typ: u(undefined, r("CipherUpdateRequest")) },
+        { json: "delete", js: "delete", typ: u(undefined, r("CipherDeleteRequest")) },
+    ], false),
+    "CipherCreateRequest": o([
+        { json: "name", js: "name", typ: "" },
+    ], false),
+    "CipherDeleteRequest": o([
+        { json: "id", js: "id", typ: "" },
+    ], false),
+    "CipherRequest": o([
+        { json: "id", js: "id", typ: "" },
+    ], false),
+    "CipherUpdateRequest": o([
+        { json: "id", js: "id", typ: "" },
+        { json: "name", js: "name", typ: "" },
+    ], false),
     "ResponseForAPIKeyLoginResponse": o([
         { json: "data", js: "data", typ: u(undefined, u(r("APIKeyLoginResponse"), null)) },
         { json: "errorMessage", js: "errorMessage", typ: u(undefined, u(null, "")) },
@@ -963,6 +1449,131 @@ const typeMap: any = {
     ], false),
     "PurpleYubiKey": o([
         { json: "nfc", js: "nfc", typ: true },
+    ], false),
+    "ResponseForCipherListResponse": o([
+        { json: "data", js: "data", typ: u(undefined, u(r("CipherListResponse"), null)) },
+        { json: "errorMessage", js: "errorMessage", typ: u(undefined, u(null, "")) },
+        { json: "success", js: "success", typ: true },
+    ], false),
+    "CipherListResponse": o([
+        { json: "ciphers", js: "ciphers", typ: a(r("CipherListView")) },
+    ], false),
+    "CipherListView": o([
+        { json: "collectionIds", js: "collectionIds", typ: a("") },
+        { json: "creationDate", js: "creationDate", typ: Date },
+        { json: "deletedDate", js: "deletedDate", typ: u(undefined, u(Date, null)) },
+        { json: "favorite", js: "favorite", typ: true },
+        { json: "folderId", js: "folderId", typ: u(undefined, u(null, "")) },
+        { json: "id", js: "id", typ: "" },
+        { json: "name", js: "name", typ: "" },
+        { json: "organizationId", js: "organizationId", typ: u(undefined, u(null, "")) },
+        { json: "reprompt", js: "reprompt", typ: r("CipherRepromptType") },
+        { json: "revisionDate", js: "revisionDate", typ: Date },
+        { json: "subTitle", js: "subTitle", typ: u(undefined, u(null, "")) },
+        { json: "type", js: "type", typ: r("CipherType") },
+    ], false),
+    "ResponseForCipherView": o([
+        { json: "data", js: "data", typ: u(undefined, u(r("CipherView"), null)) },
+        { json: "errorMessage", js: "errorMessage", typ: u(undefined, u(null, "")) },
+        { json: "success", js: "success", typ: true },
+    ], false),
+    "CipherView": o([
+        { json: "attachments", js: "attachments", typ: a(r("AttachmentView")) },
+        { json: "card", js: "card", typ: u(undefined, u(r("CardView"), null)) },
+        { json: "collectionIds", js: "collectionIds", typ: a("") },
+        { json: "creationDate", js: "creationDate", typ: Date },
+        { json: "deletedDate", js: "deletedDate", typ: u(undefined, u(Date, null)) },
+        { json: "favorite", js: "favorite", typ: true },
+        { json: "fields", js: "fields", typ: a(r("FieldView")) },
+        { json: "folderId", js: "folderId", typ: u(undefined, u(null, "")) },
+        { json: "id", js: "id", typ: "" },
+        { json: "identity", js: "identity", typ: u(undefined, u(r("IdentityView"), null)) },
+        { json: "login", js: "login", typ: u(undefined, u(r("LoginView"), null)) },
+        { json: "name", js: "name", typ: "" },
+        { json: "notes", js: "notes", typ: "" },
+        { json: "organizationId", js: "organizationId", typ: u(undefined, u(null, "")) },
+        { json: "passwordHistory", js: "passwordHistory", typ: a(r("PasswordHistoryView")) },
+        { json: "reprompt", js: "reprompt", typ: r("CipherRepromptType") },
+        { json: "revisionDate", js: "revisionDate", typ: Date },
+        { json: "type", js: "type", typ: r("CipherType") },
+    ], false),
+    "AttachmentView": o([
+        { json: "fileName", js: "fileName", typ: u(undefined, u(null, "")) },
+        { json: "id", js: "id", typ: u(undefined, u(null, "")) },
+        { json: "key", js: "key", typ: u(undefined, u(null, "")) },
+        { json: "size", js: "size", typ: u(undefined, u(null, "")) },
+        { json: "sizeName", js: "sizeName", typ: u(undefined, u(null, "")) },
+        { json: "url", js: "url", typ: u(undefined, u(null, "")) },
+    ], false),
+    "CardView": o([
+        { json: "brand", js: "brand", typ: u(undefined, u(null, "")) },
+        { json: "cardholderName", js: "cardholderName", typ: u(undefined, u(null, "")) },
+        { json: "code", js: "code", typ: u(undefined, u(null, "")) },
+        { json: "expMonth", js: "expMonth", typ: u(undefined, u(null, "")) },
+        { json: "expYear", js: "expYear", typ: u(undefined, u(null, "")) },
+        { json: "number", js: "number", typ: u(undefined, u(null, "")) },
+    ], false),
+    "FieldView": o([
+        { json: "linkedId", js: "linkedId", typ: u(undefined, u(r("LinkedIDType"), null)) },
+        { json: "name", js: "name", typ: u(undefined, u(null, "")) },
+        { json: "showCount", js: "showCount", typ: true },
+        { json: "showValue", js: "showValue", typ: true },
+        { json: "type", js: "type", typ: r("FieldType") },
+        { json: "value", js: "value", typ: u(undefined, u(null, "")) },
+    ], false),
+    "LinkedIDType": o([
+        { json: "loginLinkedId", js: "loginLinkedId", typ: u(undefined, r("LoginLinkedID")) },
+        { json: "cardLinkedId", js: "cardLinkedId", typ: u(undefined, r("CardLinkedID")) },
+        { json: "identityLinkedId", js: "identityLinkedId", typ: u(undefined, r("IdentityLinkedID")) },
+    ], false),
+    "IdentityView": o([
+        { json: "address1", js: "address1", typ: u(undefined, u(null, "")) },
+        { json: "address2", js: "address2", typ: u(undefined, u(null, "")) },
+        { json: "address3", js: "address3", typ: u(undefined, u(null, "")) },
+        { json: "city", js: "city", typ: u(undefined, u(null, "")) },
+        { json: "company", js: "company", typ: u(undefined, u(null, "")) },
+        { json: "country", js: "country", typ: u(undefined, u(null, "")) },
+        { json: "email", js: "email", typ: u(undefined, u(null, "")) },
+        { json: "firstName", js: "firstName", typ: u(undefined, u(null, "")) },
+        { json: "lastName", js: "lastName", typ: u(undefined, u(null, "")) },
+        { json: "licenseNumber", js: "licenseNumber", typ: u(undefined, u(null, "")) },
+        { json: "middleName", js: "middleName", typ: u(undefined, u(null, "")) },
+        { json: "passportNumber", js: "passportNumber", typ: u(undefined, u(null, "")) },
+        { json: "phone", js: "phone", typ: u(undefined, u(null, "")) },
+        { json: "postalCode", js: "postalCode", typ: u(undefined, u(null, "")) },
+        { json: "ssn", js: "ssn", typ: u(undefined, u(null, "")) },
+        { json: "state", js: "state", typ: u(undefined, u(null, "")) },
+        { json: "title", js: "title", typ: u(undefined, u(null, "")) },
+        { json: "username", js: "username", typ: u(undefined, u(null, "")) },
+    ], false),
+    "LoginView": o([
+        { json: "autofillOnPageLoad", js: "autofillOnPageLoad", typ: true },
+        { json: "password", js: "password", typ: "" },
+        { json: "passwordRevisionDate", js: "passwordRevisionDate", typ: u(undefined, u(Date, null)) },
+        { json: "totp", js: "totp", typ: u(undefined, u(null, "")) },
+        { json: "uris", js: "uris", typ: a(r("LoginURIView")) },
+        { json: "username", js: "username", typ: "" },
+    ], false),
+    "LoginURIView": o([
+        { json: "match", js: "match", typ: r("URIMatchType") },
+        { json: "uri", js: "uri", typ: "" },
+    ], false),
+    "PasswordHistoryView": o([
+        { json: "lastUsedDate", js: "lastUsedDate", typ: Date },
+        { json: "password", js: "password", typ: "" },
+    ], false),
+    "ResponseForFolderResponse": o([
+        { json: "data", js: "data", typ: u(undefined, u(r("FolderResponse"), null)) },
+        { json: "errorMessage", js: "errorMessage", typ: u(undefined, u(null, "")) },
+        { json: "success", js: "success", typ: true },
+    ], false),
+    "FolderResponse": o([
+        { json: "folder", js: "folder", typ: r("FolderView") },
+    ], false),
+    "FolderView": o([
+        { json: "id", js: "id", typ: "" },
+        { json: "name", js: "name", typ: "" },
+        { json: "revisionDate", js: "revisionDate", typ: Date },
     ], false),
     "ResponseForPasswordLoginResponse": o([
         { json: "data", js: "data", typ: u(undefined, u(r("PasswordLoginResponse"), null)) },
@@ -1045,6 +1656,34 @@ const typeMap: any = {
         { json: "error", js: "error", typ: u(undefined, u(null, "")) },
         { json: "id", js: "id", typ: "" },
     ], false),
+    "ResponseForSyncResponse": o([
+        { json: "data", js: "data", typ: u(undefined, u(r("SyncResponse"), null)) },
+        { json: "errorMessage", js: "errorMessage", typ: u(undefined, u(null, "")) },
+        { json: "success", js: "success", typ: true },
+    ], false),
+    "SyncResponse": o([
+        { json: "ciphers", js: "ciphers", typ: a(r("CipherDetailsResponse")) },
+        { json: "profile", js: "profile", typ: r("ProfileResponse") },
+    ], false),
+    "CipherDetailsResponse": o([
+    ], false),
+    "ProfileResponse": o([
+        { json: "email", js: "email", typ: "" },
+        { json: "id", js: "id", typ: "" },
+        { json: "name", js: "name", typ: "" },
+        { json: "organizations", js: "organizations", typ: a(r("ProfileOrganizationResponse")) },
+    ], false),
+    "ProfileOrganizationResponse": o([
+        { json: "id", js: "id", typ: "" },
+    ], false),
+    "ResponseForUserAPIKeyResponse": o([
+        { json: "data", js: "data", typ: u(undefined, u(r("UserAPIKeyResponse"), null)) },
+        { json: "errorMessage", js: "errorMessage", typ: u(undefined, u(null, "")) },
+        { json: "success", js: "success", typ: true },
+    ], false),
+    "UserAPIKeyResponse": o([
+        { json: "apiKey", js: "apiKey", typ: "" },
+    ], false),
     "DeviceType": [
         "Android",
         "AndroidAmazon",
@@ -1068,6 +1707,66 @@ const typeMap: any = {
         "VivaldiBrowser",
         "VivaldiExtension",
         "WindowsDesktop",
+    ],
+    "SCommand": [
+        "list",
+    ],
+    "CipherRepromptType": [
+        "None",
+        "Password",
+    ],
+    "CipherType": [
+        "Card",
+        "Identity",
+        "Login",
+        "SecureNote",
+    ],
+    "CardLinkedID": [
+        "brand",
+        "cardholderName",
+        "code",
+        "expMonth",
+        "expYear",
+        "number",
+    ],
+    "IdentityLinkedID": [
+        "address1",
+        "address2",
+        "address3",
+        "city",
+        "company",
+        "country",
+        "email",
+        "firstName",
+        "fullName",
+        "lastName",
+        "licenseNumber",
+        "middleName",
+        "passportNumber",
+        "phone",
+        "postalCode",
+        "ssn",
+        "state",
+        "title",
+        "username",
+    ],
+    "LoginLinkedID": [
+        "password",
+        "username",
+    ],
+    "FieldType": [
+        "boolean",
+        "hidden",
+        "linked",
+        "text",
+    ],
+    "URIMatchType": [
+        "domain",
+        "exact",
+        "host",
+        "never",
+        "regularExpression",
+        "startsWith",
     ],
 };
 

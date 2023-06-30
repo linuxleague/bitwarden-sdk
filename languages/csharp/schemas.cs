@@ -7,10 +7,15 @@
 //    var clientSettings = ClientSettings.FromJson(jsonString);
 //    var command = Command.FromJson(jsonString);
 //    var responseForApiKeyLoginResponse = ResponseForApiKeyLoginResponse.FromJson(jsonString);
+//    var responseForCipherListResponse = ResponseForCipherListResponse.FromJson(jsonString);
+//    var responseForCipherView = ResponseForCipherView.FromJson(jsonString);
+//    var responseForFolderResponse = ResponseForFolderResponse.FromJson(jsonString);
 //    var responseForPasswordLoginResponse = ResponseForPasswordLoginResponse.FromJson(jsonString);
 //    var responseForSecretIdentifiersResponse = ResponseForSecretIdentifiersResponse.FromJson(jsonString);
 //    var responseForSecretResponse = ResponseForSecretResponse.FromJson(jsonString);
 //    var responseForSecretsDeleteResponse = ResponseForSecretsDeleteResponse.FromJson(jsonString);
+//    var responseForSyncResponse = ResponseForSyncResponse.FromJson(jsonString);
+//    var responseForUserApiKeyResponse = ResponseForUserApiKeyResponse.FromJson(jsonString);
 
 namespace Bit.Sdk
 {
@@ -127,6 +132,9 @@ namespace Bit.Sdk
 
         [JsonProperty("projects", NullValueHandling = NullValueHandling.Ignore)]
         public ProjectsCommand Projects { get; set; }
+
+        [JsonProperty("vault", NullValueHandling = NullValueHandling.Ignore)]
+        public VaultCommand Vault { get; set; }
     }
 
     /// <summary>
@@ -449,6 +457,129 @@ namespace Bit.Sdk
         public bool? ExcludeSubdomains { get; set; }
     }
 
+    public partial class VaultCommand
+    {
+        [JsonProperty("folders", NullValueHandling = NullValueHandling.Ignore)]
+        public FoldersCommand? Folders { get; set; }
+
+        [JsonProperty("items", NullValueHandling = NullValueHandling.Ignore)]
+        public ItemsCommand? Items { get; set; }
+    }
+
+    /// <summary>
+    /// > Requires Authentication > Requires an unlocked vault Creates a new folder with the
+    /// provided data
+    ///
+    /// > Requires Authentication > Requires an unlocked vault and calling Sync at least once
+    /// Lists all folders in the vault
+    ///
+    /// Returns: [FoldersResponse](bitwarden::platform::folders::FoldersResponse)
+    ///
+    /// > Requires Authentication > Requires an unlocked vault Updates an existing folder with
+    /// the provided data given its ID
+    ///
+    /// > Requires Authentication > Requires an unlocked vault Deletes the folder associated with
+    /// the provided ID
+    /// </summary>
+    public partial class FoldersCommandClass
+    {
+        [JsonProperty("create", NullValueHandling = NullValueHandling.Ignore)]
+        public FolderCreateRequest Create { get; set; }
+
+        [JsonProperty("get", NullValueHandling = NullValueHandling.Ignore)]
+        public FolderRequest Get { get; set; }
+
+        [JsonProperty("update", NullValueHandling = NullValueHandling.Ignore)]
+        public FolderUpdateRequest Update { get; set; }
+
+        [JsonProperty("delete", NullValueHandling = NullValueHandling.Ignore)]
+        public FolderDeleteRequest Delete { get; set; }
+    }
+
+    public partial class FolderCreateRequest
+    {
+        [JsonProperty("name")]
+        public string Name { get; set; }
+    }
+
+    public partial class FolderDeleteRequest
+    {
+        [JsonProperty("id")]
+        public Guid Id { get; set; }
+    }
+
+    public partial class FolderRequest
+    {
+        [JsonProperty("id")]
+        public Guid Id { get; set; }
+    }
+
+    public partial class FolderUpdateRequest
+    {
+        [JsonProperty("id")]
+        public Guid Id { get; set; }
+
+        [JsonProperty("name")]
+        public string Name { get; set; }
+    }
+
+    /// <summary>
+    /// > Requires Authentication > Requires an unlocked vault Creates a new item with the
+    /// provided data
+    ///
+    /// > Requires Authentication > Requires an unlocked vault and calling Sync at least once
+    /// Retrieves a single item in the vault
+    ///
+    /// Returns: [FoldersResponse](bitwarden::platform::folders::FoldersResponse)
+    ///
+    /// > Requires Authentication > Requires an unlocked vault Updates an existing item with the
+    /// provided data given its ID
+    ///
+    /// > Requires Authentication > Requires an unlocked vault Deletes the item associated with
+    /// the provided ID
+    /// </summary>
+    public partial class ItemsCommandClass
+    {
+        [JsonProperty("create", NullValueHandling = NullValueHandling.Ignore)]
+        public CipherCreateRequest Create { get; set; }
+
+        [JsonProperty("get", NullValueHandling = NullValueHandling.Ignore)]
+        public CipherRequest Get { get; set; }
+
+        [JsonProperty("update", NullValueHandling = NullValueHandling.Ignore)]
+        public CipherUpdateRequest Update { get; set; }
+
+        [JsonProperty("delete", NullValueHandling = NullValueHandling.Ignore)]
+        public CipherDeleteRequest Delete { get; set; }
+    }
+
+    public partial class CipherCreateRequest
+    {
+        [JsonProperty("name")]
+        public string Name { get; set; }
+    }
+
+    public partial class CipherDeleteRequest
+    {
+        [JsonProperty("id")]
+        public Guid Id { get; set; }
+    }
+
+    public partial class CipherRequest
+    {
+        [JsonProperty("id")]
+        public Guid Id { get; set; }
+    }
+
+    public partial class CipherUpdateRequest
+    {
+        [JsonProperty("id")]
+        public Guid Id { get; set; }
+
+        [JsonProperty("name")]
+        public string Name { get; set; }
+    }
+
     public partial class ResponseForApiKeyLoginResponse
     {
         /// <summary>
@@ -570,6 +701,360 @@ namespace Bit.Sdk
         /// </summary>
         [JsonProperty("nfc")]
         public bool Nfc { get; set; }
+    }
+
+    public partial class ResponseForCipherListResponse
+    {
+        /// <summary>
+        /// The response data. Populated if `success` is true.
+        /// </summary>
+        [JsonProperty("data")]
+        public CipherListResponse Data { get; set; }
+
+        /// <summary>
+        /// A message for any error that may occur. Populated if `success` is false.
+        /// </summary>
+        [JsonProperty("errorMessage")]
+        public string ErrorMessage { get; set; }
+
+        /// <summary>
+        /// Whether or not the SDK request succeeded.
+        /// </summary>
+        [JsonProperty("success")]
+        public bool Success { get; set; }
+    }
+
+    public partial class CipherListResponse
+    {
+        [JsonProperty("ciphers")]
+        public CipherListView[] Ciphers { get; set; }
+    }
+
+    public partial class CipherListView
+    {
+        [JsonProperty("collectionIds")]
+        public Guid[] CollectionIds { get; set; }
+
+        [JsonProperty("creationDate")]
+        public DateTimeOffset CreationDate { get; set; }
+
+        [JsonProperty("deletedDate")]
+        public DateTimeOffset? DeletedDate { get; set; }
+
+        [JsonProperty("favorite")]
+        public bool Favorite { get; set; }
+
+        [JsonProperty("folderId")]
+        public Guid? FolderId { get; set; }
+
+        [JsonProperty("id")]
+        public Guid Id { get; set; }
+
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        [JsonProperty("organizationId")]
+        public Guid? OrganizationId { get; set; }
+
+        [JsonProperty("reprompt")]
+        public CipherRepromptType Reprompt { get; set; }
+
+        [JsonProperty("revisionDate")]
+        public DateTimeOffset RevisionDate { get; set; }
+
+        [JsonProperty("subTitle")]
+        public string SubTitle { get; set; }
+
+        [JsonProperty("type")]
+        public CipherType Type { get; set; }
+    }
+
+    public partial class ResponseForCipherView
+    {
+        /// <summary>
+        /// The response data. Populated if `success` is true.
+        /// </summary>
+        [JsonProperty("data")]
+        public CipherView Data { get; set; }
+
+        /// <summary>
+        /// A message for any error that may occur. Populated if `success` is false.
+        /// </summary>
+        [JsonProperty("errorMessage")]
+        public string ErrorMessage { get; set; }
+
+        /// <summary>
+        /// Whether or not the SDK request succeeded.
+        /// </summary>
+        [JsonProperty("success")]
+        public bool Success { get; set; }
+    }
+
+    public partial class CipherView
+    {
+        [JsonProperty("attachments")]
+        public AttachmentView[] Attachments { get; set; }
+
+        [JsonProperty("card")]
+        public CardView Card { get; set; }
+
+        [JsonProperty("collectionIds")]
+        public Guid[] CollectionIds { get; set; }
+
+        [JsonProperty("creationDate")]
+        public DateTimeOffset CreationDate { get; set; }
+
+        [JsonProperty("deletedDate")]
+        public DateTimeOffset? DeletedDate { get; set; }
+
+        [JsonProperty("favorite")]
+        public bool Favorite { get; set; }
+
+        [JsonProperty("fields")]
+        public FieldView[] Fields { get; set; }
+
+        [JsonProperty("folderId")]
+        public Guid? FolderId { get; set; }
+
+        [JsonProperty("id")]
+        public Guid Id { get; set; }
+
+        [JsonProperty("identity")]
+        public IdentityView Identity { get; set; }
+
+        [JsonProperty("login")]
+        public LoginView Login { get; set; }
+
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        [JsonProperty("notes")]
+        public string Notes { get; set; }
+
+        [JsonProperty("organizationId")]
+        public Guid? OrganizationId { get; set; }
+
+        [JsonProperty("passwordHistory")]
+        public PasswordHistoryView[] PasswordHistory { get; set; }
+
+        [JsonProperty("reprompt")]
+        public CipherRepromptType Reprompt { get; set; }
+
+        [JsonProperty("revisionDate")]
+        public DateTimeOffset RevisionDate { get; set; }
+
+        [JsonProperty("type")]
+        public CipherType Type { get; set; }
+    }
+
+    public partial class AttachmentView
+    {
+        [JsonProperty("fileName")]
+        public string FileName { get; set; }
+
+        [JsonProperty("id")]
+        public string Id { get; set; }
+
+        [JsonProperty("key")]
+        public string Key { get; set; }
+
+        [JsonProperty("size")]
+        public string Size { get; set; }
+
+        [JsonProperty("sizeName")]
+        public string SizeName { get; set; }
+
+        [JsonProperty("url")]
+        public string Url { get; set; }
+    }
+
+    public partial class CardView
+    {
+        [JsonProperty("brand")]
+        public string Brand { get; set; }
+
+        [JsonProperty("cardholderName")]
+        public string CardholderName { get; set; }
+
+        [JsonProperty("code")]
+        public string Code { get; set; }
+
+        [JsonProperty("expMonth")]
+        public string ExpMonth { get; set; }
+
+        [JsonProperty("expYear")]
+        public string ExpYear { get; set; }
+
+        [JsonProperty("number")]
+        public string Number { get; set; }
+    }
+
+    public partial class FieldView
+    {
+        [JsonProperty("linkedId")]
+        public LinkedIdType LinkedId { get; set; }
+
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        [JsonProperty("showCount")]
+        public bool ShowCount { get; set; }
+
+        [JsonProperty("showValue")]
+        public bool ShowValue { get; set; }
+
+        [JsonProperty("type")]
+        public FieldType Type { get; set; }
+
+        [JsonProperty("value")]
+        public string Value { get; set; }
+    }
+
+    public partial class LinkedIdType
+    {
+        [JsonProperty("loginLinkedId", NullValueHandling = NullValueHandling.Ignore)]
+        public LoginLinkedId? LoginLinkedId { get; set; }
+
+        [JsonProperty("cardLinkedId", NullValueHandling = NullValueHandling.Ignore)]
+        public CardLinkedId? CardLinkedId { get; set; }
+
+        [JsonProperty("identityLinkedId", NullValueHandling = NullValueHandling.Ignore)]
+        public IdentityLinkedId? IdentityLinkedId { get; set; }
+    }
+
+    public partial class IdentityView
+    {
+        [JsonProperty("address1")]
+        public string Address1 { get; set; }
+
+        [JsonProperty("address2")]
+        public string Address2 { get; set; }
+
+        [JsonProperty("address3")]
+        public string Address3 { get; set; }
+
+        [JsonProperty("city")]
+        public string City { get; set; }
+
+        [JsonProperty("company")]
+        public string Company { get; set; }
+
+        [JsonProperty("country")]
+        public string Country { get; set; }
+
+        [JsonProperty("email")]
+        public string Email { get; set; }
+
+        [JsonProperty("firstName")]
+        public string FirstName { get; set; }
+
+        [JsonProperty("lastName")]
+        public string LastName { get; set; }
+
+        [JsonProperty("licenseNumber")]
+        public string LicenseNumber { get; set; }
+
+        [JsonProperty("middleName")]
+        public string MiddleName { get; set; }
+
+        [JsonProperty("passportNumber")]
+        public string PassportNumber { get; set; }
+
+        [JsonProperty("phone")]
+        public string Phone { get; set; }
+
+        [JsonProperty("postalCode")]
+        public string PostalCode { get; set; }
+
+        [JsonProperty("ssn")]
+        public string Ssn { get; set; }
+
+        [JsonProperty("state")]
+        public string State { get; set; }
+
+        [JsonProperty("title")]
+        public string Title { get; set; }
+
+        [JsonProperty("username")]
+        public string Username { get; set; }
+    }
+
+    public partial class LoginView
+    {
+        [JsonProperty("autofillOnPageLoad")]
+        public bool AutofillOnPageLoad { get; set; }
+
+        [JsonProperty("password")]
+        public string Password { get; set; }
+
+        [JsonProperty("passwordRevisionDate")]
+        public DateTimeOffset? PasswordRevisionDate { get; set; }
+
+        [JsonProperty("totp")]
+        public string Totp { get; set; }
+
+        [JsonProperty("uris")]
+        public LoginUriView[] Uris { get; set; }
+
+        [JsonProperty("username")]
+        public string Username { get; set; }
+    }
+
+    public partial class LoginUriView
+    {
+        [JsonProperty("match")]
+        public UriMatchType Match { get; set; }
+
+        [JsonProperty("uri")]
+        public string Uri { get; set; }
+    }
+
+    public partial class PasswordHistoryView
+    {
+        [JsonProperty("lastUsedDate")]
+        public DateTimeOffset LastUsedDate { get; set; }
+
+        [JsonProperty("password")]
+        public string Password { get; set; }
+    }
+
+    public partial class ResponseForFolderResponse
+    {
+        /// <summary>
+        /// The response data. Populated if `success` is true.
+        /// </summary>
+        [JsonProperty("data")]
+        public FolderResponse Data { get; set; }
+
+        /// <summary>
+        /// A message for any error that may occur. Populated if `success` is false.
+        /// </summary>
+        [JsonProperty("errorMessage")]
+        public string ErrorMessage { get; set; }
+
+        /// <summary>
+        /// Whether or not the SDK request succeeded.
+        /// </summary>
+        [JsonProperty("success")]
+        public bool Success { get; set; }
+    }
+
+    public partial class FolderResponse
+    {
+        [JsonProperty("folder")]
+        public FolderView Folder { get; set; }
+    }
+
+    public partial class FolderView
+    {
+        [JsonProperty("id")]
+        public Guid Id { get; set; }
+
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        [JsonProperty("revisionDate")]
+        public DateTimeOffset RevisionDate { get; set; }
     }
 
     public partial class ResponseForPasswordLoginResponse
@@ -841,10 +1326,151 @@ namespace Bit.Sdk
         public Guid Id { get; set; }
     }
 
+    public partial class ResponseForSyncResponse
+    {
+        /// <summary>
+        /// The response data. Populated if `success` is true.
+        /// </summary>
+        [JsonProperty("data")]
+        public SyncResponse Data { get; set; }
+
+        /// <summary>
+        /// A message for any error that may occur. Populated if `success` is false.
+        /// </summary>
+        [JsonProperty("errorMessage")]
+        public string ErrorMessage { get; set; }
+
+        /// <summary>
+        /// Whether or not the SDK request succeeded.
+        /// </summary>
+        [JsonProperty("success")]
+        public bool Success { get; set; }
+    }
+
+    public partial class SyncResponse
+    {
+        /// <summary>
+        /// List of ciphers accesible by the user
+        /// </summary>
+        [JsonProperty("ciphers")]
+        public CipherDetailsResponse[] Ciphers { get; set; }
+
+        /// <summary>
+        /// Data about the user, including their encryption keys and the organizations they are a
+        /// part of
+        /// </summary>
+        [JsonProperty("profile")]
+        public ProfileResponse Profile { get; set; }
+    }
+
+    public partial class CipherDetailsResponse
+    {
+    }
+
+    /// <summary>
+    /// Data about the user, including their encryption keys and the organizations they are a
+    /// part of
+    /// </summary>
+    public partial class ProfileResponse
+    {
+        [JsonProperty("email")]
+        public string Email { get; set; }
+
+        [JsonProperty("id")]
+        public Guid Id { get; set; }
+
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        [JsonProperty("organizations")]
+        public ProfileOrganizationResponse[] Organizations { get; set; }
+    }
+
+    public partial class ProfileOrganizationResponse
+    {
+        [JsonProperty("id")]
+        public Guid Id { get; set; }
+    }
+
+    public partial class ResponseForUserApiKeyResponse
+    {
+        /// <summary>
+        /// The response data. Populated if `success` is true.
+        /// </summary>
+        [JsonProperty("data")]
+        public UserApiKeyResponse Data { get; set; }
+
+        /// <summary>
+        /// A message for any error that may occur. Populated if `success` is false.
+        /// </summary>
+        [JsonProperty("errorMessage")]
+        public string ErrorMessage { get; set; }
+
+        /// <summary>
+        /// Whether or not the SDK request succeeded.
+        /// </summary>
+        [JsonProperty("success")]
+        public bool Success { get; set; }
+    }
+
+    public partial class UserApiKeyResponse
+    {
+        /// <summary>
+        /// The user's API key, which represents the client_secret portion of an oauth request.
+        /// </summary>
+        [JsonProperty("apiKey")]
+        public string ApiKey { get; set; }
+    }
+
     /// <summary>
     /// Device type to send to Bitwarden. Defaults to SDK
     /// </summary>
     public enum DeviceType { Android, AndroidAmazon, ChromeBrowser, ChromeExtension, EdgeBrowser, EdgeExtension, FirefoxBrowser, FirefoxExtension, IOs, IeBrowser, LinuxDesktop, MacOsDesktop, OperaBrowser, OperaExtension, SafariBrowser, SafariExtension, Sdk, UnknownBrowser, Uwp, VivaldiBrowser, VivaldiExtension, WindowsDesktop };
+
+    /// <summary>
+    /// > Requires Authentication > Requires an unlocked vault and calling Sync at least once
+    /// Lists all folders in the vault
+    ///
+    /// Returns: [FoldersResponse](bitwarden::platform::folders::FoldersResponse)
+    ///
+    /// > Requires Authentication > Requires an unlocked vault and calling Sync at least once
+    /// Lists all items in the vault
+    ///
+    /// Returns: [CipherListResponse](bitwarden::vault::cipher::CipherListResponse)
+    /// </summary>
+    public enum SCommand { List };
+
+    public enum CipherRepromptType { None, Password };
+
+    public enum CipherType { Card, Identity, Login, SecureNote };
+
+    public enum CardLinkedId { Brand, CardholderName, Code, ExpMonth, ExpYear, Number };
+
+    public enum IdentityLinkedId { Address1, Address2, Address3, City, Company, Country, Email, FirstName, FullName, LastName, LicenseNumber, MiddleName, PassportNumber, Phone, PostalCode, Ssn, State, Title, Username };
+
+    public enum LoginLinkedId { Password, Username };
+
+    public enum FieldType { Boolean, Hidden, Linked, Text };
+
+    public enum UriMatchType { Domain, Exact, Host, Never, RegularExpression, StartsWith };
+
+    public partial struct FoldersCommand
+    {
+        public SCommand? Enum;
+        public FoldersCommandClass FoldersCommandClass;
+
+        public static implicit operator FoldersCommand(SCommand Enum) => new FoldersCommand { Enum = Enum };
+        public static implicit operator FoldersCommand(FoldersCommandClass FoldersCommandClass) => new FoldersCommand { FoldersCommandClass = FoldersCommandClass };
+    }
+
+    public partial struct ItemsCommand
+    {
+        public SCommand? Enum;
+        public ItemsCommandClass ItemsCommandClass;
+
+        public static implicit operator ItemsCommand(SCommand Enum) => new ItemsCommand { Enum = Enum };
+        public static implicit operator ItemsCommand(ItemsCommandClass ItemsCommandClass) => new ItemsCommand { ItemsCommandClass = ItemsCommandClass };
+    }
 
     public partial class ClientSettings
     {
@@ -859,6 +1485,21 @@ namespace Bit.Sdk
     public partial class ResponseForApiKeyLoginResponse
     {
         public static ResponseForApiKeyLoginResponse FromJson(string json) => JsonConvert.DeserializeObject<ResponseForApiKeyLoginResponse>(json, Bit.Sdk.Converter.Settings);
+    }
+
+    public partial class ResponseForCipherListResponse
+    {
+        public static ResponseForCipherListResponse FromJson(string json) => JsonConvert.DeserializeObject<ResponseForCipherListResponse>(json, Bit.Sdk.Converter.Settings);
+    }
+
+    public partial class ResponseForCipherView
+    {
+        public static ResponseForCipherView FromJson(string json) => JsonConvert.DeserializeObject<ResponseForCipherView>(json, Bit.Sdk.Converter.Settings);
+    }
+
+    public partial class ResponseForFolderResponse
+    {
+        public static ResponseForFolderResponse FromJson(string json) => JsonConvert.DeserializeObject<ResponseForFolderResponse>(json, Bit.Sdk.Converter.Settings);
     }
 
     public partial class ResponseForPasswordLoginResponse
@@ -881,15 +1522,30 @@ namespace Bit.Sdk
         public static ResponseForSecretsDeleteResponse FromJson(string json) => JsonConvert.DeserializeObject<ResponseForSecretsDeleteResponse>(json, Bit.Sdk.Converter.Settings);
     }
 
+    public partial class ResponseForSyncResponse
+    {
+        public static ResponseForSyncResponse FromJson(string json) => JsonConvert.DeserializeObject<ResponseForSyncResponse>(json, Bit.Sdk.Converter.Settings);
+    }
+
+    public partial class ResponseForUserApiKeyResponse
+    {
+        public static ResponseForUserApiKeyResponse FromJson(string json) => JsonConvert.DeserializeObject<ResponseForUserApiKeyResponse>(json, Bit.Sdk.Converter.Settings);
+    }
+
     public static class Serialize
     {
         public static string ToJson(this ClientSettings self) => JsonConvert.SerializeObject(self, Bit.Sdk.Converter.Settings);
         public static string ToJson(this Command self) => JsonConvert.SerializeObject(self, Bit.Sdk.Converter.Settings);
         public static string ToJson(this ResponseForApiKeyLoginResponse self) => JsonConvert.SerializeObject(self, Bit.Sdk.Converter.Settings);
+        public static string ToJson(this ResponseForCipherListResponse self) => JsonConvert.SerializeObject(self, Bit.Sdk.Converter.Settings);
+        public static string ToJson(this ResponseForCipherView self) => JsonConvert.SerializeObject(self, Bit.Sdk.Converter.Settings);
+        public static string ToJson(this ResponseForFolderResponse self) => JsonConvert.SerializeObject(self, Bit.Sdk.Converter.Settings);
         public static string ToJson(this ResponseForPasswordLoginResponse self) => JsonConvert.SerializeObject(self, Bit.Sdk.Converter.Settings);
         public static string ToJson(this ResponseForSecretIdentifiersResponse self) => JsonConvert.SerializeObject(self, Bit.Sdk.Converter.Settings);
         public static string ToJson(this ResponseForSecretResponse self) => JsonConvert.SerializeObject(self, Bit.Sdk.Converter.Settings);
         public static string ToJson(this ResponseForSecretsDeleteResponse self) => JsonConvert.SerializeObject(self, Bit.Sdk.Converter.Settings);
+        public static string ToJson(this ResponseForSyncResponse self) => JsonConvert.SerializeObject(self, Bit.Sdk.Converter.Settings);
+        public static string ToJson(this ResponseForUserApiKeyResponse self) => JsonConvert.SerializeObject(self, Bit.Sdk.Converter.Settings);
     }
 
     internal static class Converter
@@ -901,6 +1557,16 @@ namespace Bit.Sdk
             Converters =
             {
                 DeviceTypeConverter.Singleton,
+                FoldersCommandConverter.Singleton,
+                SCommandConverter.Singleton,
+                ItemsCommandConverter.Singleton,
+                CipherRepromptTypeConverter.Singleton,
+                CipherTypeConverter.Singleton,
+                CardLinkedIdConverter.Singleton,
+                IdentityLinkedIdConverter.Singleton,
+                LoginLinkedIdConverter.Singleton,
+                FieldTypeConverter.Singleton,
+                UriMatchTypeConverter.Singleton,
                 new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
             },
         };
@@ -1045,6 +1711,562 @@ namespace Bit.Sdk
         }
 
         public static readonly DeviceTypeConverter Singleton = new DeviceTypeConverter();
+    }
+
+    internal class FoldersCommandConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(FoldersCommand) || t == typeof(FoldersCommand?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            switch (reader.TokenType)
+            {
+                case JsonToken.String:
+                case JsonToken.Date:
+                    var stringValue = serializer.Deserialize<string>(reader);
+                    if (stringValue == "list")
+                    {
+                        return new FoldersCommand { Enum = SCommand.List };
+                    }
+                    break;
+                case JsonToken.StartObject:
+                    var objectValue = serializer.Deserialize<FoldersCommandClass>(reader);
+                    return new FoldersCommand { FoldersCommandClass = objectValue };
+            }
+            throw new Exception("Cannot unmarshal type FoldersCommand");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            var value = (FoldersCommand)untypedValue;
+            if (value.Enum != null)
+            {
+                if (value.Enum == SCommand.List)
+                {
+                    serializer.Serialize(writer, "list");
+                    return;
+                }
+            }
+            if (value.FoldersCommandClass != null)
+            {
+                serializer.Serialize(writer, value.FoldersCommandClass);
+                return;
+            }
+            throw new Exception("Cannot marshal type FoldersCommand");
+        }
+
+        public static readonly FoldersCommandConverter Singleton = new FoldersCommandConverter();
+    }
+
+    internal class SCommandConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(SCommand) || t == typeof(SCommand?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            if (value == "list")
+            {
+                return SCommand.List;
+            }
+            throw new Exception("Cannot unmarshal type SCommand");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (SCommand)untypedValue;
+            if (value == SCommand.List)
+            {
+                serializer.Serialize(writer, "list");
+                return;
+            }
+            throw new Exception("Cannot marshal type SCommand");
+        }
+
+        public static readonly SCommandConverter Singleton = new SCommandConverter();
+    }
+
+    internal class ItemsCommandConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(ItemsCommand) || t == typeof(ItemsCommand?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            switch (reader.TokenType)
+            {
+                case JsonToken.String:
+                case JsonToken.Date:
+                    var stringValue = serializer.Deserialize<string>(reader);
+                    if (stringValue == "list")
+                    {
+                        return new ItemsCommand { Enum = SCommand.List };
+                    }
+                    break;
+                case JsonToken.StartObject:
+                    var objectValue = serializer.Deserialize<ItemsCommandClass>(reader);
+                    return new ItemsCommand { ItemsCommandClass = objectValue };
+            }
+            throw new Exception("Cannot unmarshal type ItemsCommand");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            var value = (ItemsCommand)untypedValue;
+            if (value.Enum != null)
+            {
+                if (value.Enum == SCommand.List)
+                {
+                    serializer.Serialize(writer, "list");
+                    return;
+                }
+            }
+            if (value.ItemsCommandClass != null)
+            {
+                serializer.Serialize(writer, value.ItemsCommandClass);
+                return;
+            }
+            throw new Exception("Cannot marshal type ItemsCommand");
+        }
+
+        public static readonly ItemsCommandConverter Singleton = new ItemsCommandConverter();
+    }
+
+    internal class CipherRepromptTypeConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(CipherRepromptType) || t == typeof(CipherRepromptType?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "None":
+                    return CipherRepromptType.None;
+                case "Password":
+                    return CipherRepromptType.Password;
+            }
+            throw new Exception("Cannot unmarshal type CipherRepromptType");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (CipherRepromptType)untypedValue;
+            switch (value)
+            {
+                case CipherRepromptType.None:
+                    serializer.Serialize(writer, "None");
+                    return;
+                case CipherRepromptType.Password:
+                    serializer.Serialize(writer, "Password");
+                    return;
+            }
+            throw new Exception("Cannot marshal type CipherRepromptType");
+        }
+
+        public static readonly CipherRepromptTypeConverter Singleton = new CipherRepromptTypeConverter();
+    }
+
+    internal class CipherTypeConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(CipherType) || t == typeof(CipherType?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "Card":
+                    return CipherType.Card;
+                case "Identity":
+                    return CipherType.Identity;
+                case "Login":
+                    return CipherType.Login;
+                case "SecureNote":
+                    return CipherType.SecureNote;
+            }
+            throw new Exception("Cannot unmarshal type CipherType");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (CipherType)untypedValue;
+            switch (value)
+            {
+                case CipherType.Card:
+                    serializer.Serialize(writer, "Card");
+                    return;
+                case CipherType.Identity:
+                    serializer.Serialize(writer, "Identity");
+                    return;
+                case CipherType.Login:
+                    serializer.Serialize(writer, "Login");
+                    return;
+                case CipherType.SecureNote:
+                    serializer.Serialize(writer, "SecureNote");
+                    return;
+            }
+            throw new Exception("Cannot marshal type CipherType");
+        }
+
+        public static readonly CipherTypeConverter Singleton = new CipherTypeConverter();
+    }
+
+    internal class CardLinkedIdConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(CardLinkedId) || t == typeof(CardLinkedId?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "brand":
+                    return CardLinkedId.Brand;
+                case "cardholderName":
+                    return CardLinkedId.CardholderName;
+                case "code":
+                    return CardLinkedId.Code;
+                case "expMonth":
+                    return CardLinkedId.ExpMonth;
+                case "expYear":
+                    return CardLinkedId.ExpYear;
+                case "number":
+                    return CardLinkedId.Number;
+            }
+            throw new Exception("Cannot unmarshal type CardLinkedId");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (CardLinkedId)untypedValue;
+            switch (value)
+            {
+                case CardLinkedId.Brand:
+                    serializer.Serialize(writer, "brand");
+                    return;
+                case CardLinkedId.CardholderName:
+                    serializer.Serialize(writer, "cardholderName");
+                    return;
+                case CardLinkedId.Code:
+                    serializer.Serialize(writer, "code");
+                    return;
+                case CardLinkedId.ExpMonth:
+                    serializer.Serialize(writer, "expMonth");
+                    return;
+                case CardLinkedId.ExpYear:
+                    serializer.Serialize(writer, "expYear");
+                    return;
+                case CardLinkedId.Number:
+                    serializer.Serialize(writer, "number");
+                    return;
+            }
+            throw new Exception("Cannot marshal type CardLinkedId");
+        }
+
+        public static readonly CardLinkedIdConverter Singleton = new CardLinkedIdConverter();
+    }
+
+    internal class IdentityLinkedIdConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(IdentityLinkedId) || t == typeof(IdentityLinkedId?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "address1":
+                    return IdentityLinkedId.Address1;
+                case "address2":
+                    return IdentityLinkedId.Address2;
+                case "address3":
+                    return IdentityLinkedId.Address3;
+                case "city":
+                    return IdentityLinkedId.City;
+                case "company":
+                    return IdentityLinkedId.Company;
+                case "country":
+                    return IdentityLinkedId.Country;
+                case "email":
+                    return IdentityLinkedId.Email;
+                case "firstName":
+                    return IdentityLinkedId.FirstName;
+                case "fullName":
+                    return IdentityLinkedId.FullName;
+                case "lastName":
+                    return IdentityLinkedId.LastName;
+                case "licenseNumber":
+                    return IdentityLinkedId.LicenseNumber;
+                case "middleName":
+                    return IdentityLinkedId.MiddleName;
+                case "passportNumber":
+                    return IdentityLinkedId.PassportNumber;
+                case "phone":
+                    return IdentityLinkedId.Phone;
+                case "postalCode":
+                    return IdentityLinkedId.PostalCode;
+                case "ssn":
+                    return IdentityLinkedId.Ssn;
+                case "state":
+                    return IdentityLinkedId.State;
+                case "title":
+                    return IdentityLinkedId.Title;
+                case "username":
+                    return IdentityLinkedId.Username;
+            }
+            throw new Exception("Cannot unmarshal type IdentityLinkedId");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (IdentityLinkedId)untypedValue;
+            switch (value)
+            {
+                case IdentityLinkedId.Address1:
+                    serializer.Serialize(writer, "address1");
+                    return;
+                case IdentityLinkedId.Address2:
+                    serializer.Serialize(writer, "address2");
+                    return;
+                case IdentityLinkedId.Address3:
+                    serializer.Serialize(writer, "address3");
+                    return;
+                case IdentityLinkedId.City:
+                    serializer.Serialize(writer, "city");
+                    return;
+                case IdentityLinkedId.Company:
+                    serializer.Serialize(writer, "company");
+                    return;
+                case IdentityLinkedId.Country:
+                    serializer.Serialize(writer, "country");
+                    return;
+                case IdentityLinkedId.Email:
+                    serializer.Serialize(writer, "email");
+                    return;
+                case IdentityLinkedId.FirstName:
+                    serializer.Serialize(writer, "firstName");
+                    return;
+                case IdentityLinkedId.FullName:
+                    serializer.Serialize(writer, "fullName");
+                    return;
+                case IdentityLinkedId.LastName:
+                    serializer.Serialize(writer, "lastName");
+                    return;
+                case IdentityLinkedId.LicenseNumber:
+                    serializer.Serialize(writer, "licenseNumber");
+                    return;
+                case IdentityLinkedId.MiddleName:
+                    serializer.Serialize(writer, "middleName");
+                    return;
+                case IdentityLinkedId.PassportNumber:
+                    serializer.Serialize(writer, "passportNumber");
+                    return;
+                case IdentityLinkedId.Phone:
+                    serializer.Serialize(writer, "phone");
+                    return;
+                case IdentityLinkedId.PostalCode:
+                    serializer.Serialize(writer, "postalCode");
+                    return;
+                case IdentityLinkedId.Ssn:
+                    serializer.Serialize(writer, "ssn");
+                    return;
+                case IdentityLinkedId.State:
+                    serializer.Serialize(writer, "state");
+                    return;
+                case IdentityLinkedId.Title:
+                    serializer.Serialize(writer, "title");
+                    return;
+                case IdentityLinkedId.Username:
+                    serializer.Serialize(writer, "username");
+                    return;
+            }
+            throw new Exception("Cannot marshal type IdentityLinkedId");
+        }
+
+        public static readonly IdentityLinkedIdConverter Singleton = new IdentityLinkedIdConverter();
+    }
+
+    internal class LoginLinkedIdConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(LoginLinkedId) || t == typeof(LoginLinkedId?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "password":
+                    return LoginLinkedId.Password;
+                case "username":
+                    return LoginLinkedId.Username;
+            }
+            throw new Exception("Cannot unmarshal type LoginLinkedId");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (LoginLinkedId)untypedValue;
+            switch (value)
+            {
+                case LoginLinkedId.Password:
+                    serializer.Serialize(writer, "password");
+                    return;
+                case LoginLinkedId.Username:
+                    serializer.Serialize(writer, "username");
+                    return;
+            }
+            throw new Exception("Cannot marshal type LoginLinkedId");
+        }
+
+        public static readonly LoginLinkedIdConverter Singleton = new LoginLinkedIdConverter();
+    }
+
+    internal class FieldTypeConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(FieldType) || t == typeof(FieldType?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "boolean":
+                    return FieldType.Boolean;
+                case "hidden":
+                    return FieldType.Hidden;
+                case "linked":
+                    return FieldType.Linked;
+                case "text":
+                    return FieldType.Text;
+            }
+            throw new Exception("Cannot unmarshal type FieldType");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (FieldType)untypedValue;
+            switch (value)
+            {
+                case FieldType.Boolean:
+                    serializer.Serialize(writer, "boolean");
+                    return;
+                case FieldType.Hidden:
+                    serializer.Serialize(writer, "hidden");
+                    return;
+                case FieldType.Linked:
+                    serializer.Serialize(writer, "linked");
+                    return;
+                case FieldType.Text:
+                    serializer.Serialize(writer, "text");
+                    return;
+            }
+            throw new Exception("Cannot marshal type FieldType");
+        }
+
+        public static readonly FieldTypeConverter Singleton = new FieldTypeConverter();
+    }
+
+    internal class UriMatchTypeConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(UriMatchType) || t == typeof(UriMatchType?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "domain":
+                    return UriMatchType.Domain;
+                case "exact":
+                    return UriMatchType.Exact;
+                case "host":
+                    return UriMatchType.Host;
+                case "never":
+                    return UriMatchType.Never;
+                case "regularExpression":
+                    return UriMatchType.RegularExpression;
+                case "startsWith":
+                    return UriMatchType.StartsWith;
+            }
+            throw new Exception("Cannot unmarshal type UriMatchType");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (UriMatchType)untypedValue;
+            switch (value)
+            {
+                case UriMatchType.Domain:
+                    serializer.Serialize(writer, "domain");
+                    return;
+                case UriMatchType.Exact:
+                    serializer.Serialize(writer, "exact");
+                    return;
+                case UriMatchType.Host:
+                    serializer.Serialize(writer, "host");
+                    return;
+                case UriMatchType.Never:
+                    serializer.Serialize(writer, "never");
+                    return;
+                case UriMatchType.RegularExpression:
+                    serializer.Serialize(writer, "regularExpression");
+                    return;
+                case UriMatchType.StartsWith:
+                    serializer.Serialize(writer, "startsWith");
+                    return;
+            }
+            throw new Exception("Cannot marshal type UriMatchType");
+        }
+
+        public static readonly UriMatchTypeConverter Singleton = new UriMatchTypeConverter();
     }
 }
 

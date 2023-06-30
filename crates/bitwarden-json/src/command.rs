@@ -18,6 +18,10 @@ use bitwarden::{
 use bitwarden::{
     auth::request::{ApiKeyLoginRequest, PasswordLoginRequest},
     platform::{FingerprintRequest, SecretVerificationRequest, SyncRequest},
+    vault::{
+        CipherCreateRequest, CipherDeleteRequest, CipherRequest, CipherUpdateRequest,
+        FolderCreateRequest, FolderDeleteRequest, FolderRequest, FolderUpdateRequest,
+    },
 };
 
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
@@ -78,6 +82,9 @@ pub enum Command {
 
     Secrets(SecretsCommand),
     Projects(ProjectsCommand),
+
+    #[cfg(feature = "internal")]
+    Vault(VaultCommand),
 }
 
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
@@ -166,4 +173,90 @@ pub enum ProjectsCommand {
     /// Returns: [ProjectsDeleteResponse](crate::sdk::response::projects_response::ProjectsDeleteResponse)
     ///
     Delete(ProjectsDeleteRequest),
+}
+
+#[cfg(feature = "internal")]
+#[derive(Serialize, Deserialize, JsonSchema, Debug)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub enum VaultCommand {
+    Folders(FoldersCommand),
+    Items(ItemsCommand),
+}
+
+#[cfg(feature = "internal")]
+#[derive(Serialize, Deserialize, JsonSchema, Debug)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub enum FoldersCommand {
+    /// > Requires Authentication
+    /// > Requires an unlocked vault
+    /// Creates a new folder with the provided data
+    ///
+    Create(FolderCreateRequest),
+
+    /// > Requires Authentication
+    /// > Requires an unlocked vault and calling Sync at least once
+    /// Lists all folders in the vault
+    ///
+    /// Returns: [FoldersResponse](bitwarden::platform::folders::FoldersResponse)
+    ///
+    List,
+
+    /// > Requires Authentication
+    /// > Requires an unlocked vault and calling Sync at least once
+    /// Lists all folders in the vault
+    ///
+    /// Returns: [FoldersResponse](bitwarden::platform::folders::FoldersResponse)
+    ///
+    Get(FolderRequest),
+
+    /// > Requires Authentication
+    /// > Requires an unlocked vault
+    /// Updates an existing folder with the provided data given its ID
+    ///
+    Update(FolderUpdateRequest),
+
+    /// > Requires Authentication
+    /// > Requires an unlocked vault
+    /// Deletes the folder associated with the provided ID
+    ///
+    Delete(FolderDeleteRequest),
+}
+
+#[cfg(feature = "internal")]
+#[derive(Serialize, Deserialize, JsonSchema, Debug)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub enum ItemsCommand {
+    /// > Requires Authentication
+    /// > Requires an unlocked vault
+    /// Creates a new item with the provided data
+    ///
+    Create(CipherCreateRequest),
+
+    /// > Requires Authentication
+    /// > Requires an unlocked vault and calling Sync at least once
+    /// Lists all items in the vault
+    ///
+    /// Returns: [CipherListResponse](bitwarden::vault::cipher::CipherListResponse)
+    ///
+    List,
+
+    /// > Requires Authentication
+    /// > Requires an unlocked vault and calling Sync at least once
+    /// Retrieves a single item in the vault
+    ///
+    /// Returns: [FoldersResponse](bitwarden::platform::folders::FoldersResponse)
+    ///
+    Get(CipherRequest),
+
+    /// > Requires Authentication
+    /// > Requires an unlocked vault
+    /// Updates an existing item with the provided data given its ID
+    ///
+    Update(CipherUpdateRequest),
+
+    /// > Requires Authentication
+    /// > Requires an unlocked vault
+    /// Deletes the item associated with the provided ID
+    ///
+    Delete(CipherDeleteRequest),
 }

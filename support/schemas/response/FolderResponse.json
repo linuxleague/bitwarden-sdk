@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Response_for_FolderResponse",
+  "type": "object",
+  "required": [
+    "success"
+  ],
+  "properties": {
+    "data": {
+      "description": "The response data. Populated if `success` is true.",
+      "anyOf": [
+        {
+          "$ref": "#/definitions/FolderResponse"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "errorMessage": {
+      "description": "A message for any error that may occur. Populated if `success` is false.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "success": {
+      "description": "Whether or not the SDK request succeeded.",
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "FolderResponse": {
+      "type": "object",
+      "required": [
+        "folder"
+      ],
+      "properties": {
+        "folder": {
+          "$ref": "#/definitions/FolderView"
+        }
+      },
+      "additionalProperties": false
+    },
+    "FolderView": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "revisionDate"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "name": {
+          "type": "string"
+        },
+        "revisionDate": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

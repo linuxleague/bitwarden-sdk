@@ -109,6 +109,9 @@ fn main() -> Result<()> {
     write_schema_for_response! {
         bitwarden::platform::SyncResponse,
         bitwarden::platform::UserApiKeyResponse,
+        bitwarden::vault::CipherListResponse,
+        bitwarden::vault::CipherView,
+        bitwarden::vault::FolderResponse,
     };
 
     Ok(())

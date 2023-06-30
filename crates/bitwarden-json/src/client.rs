@@ -66,6 +66,11 @@ impl Client {
                 ProjectsCommand::Update(req) => self.0.projects().update(&req).await.into_string(),
                 ProjectsCommand::Delete(req) => self.0.projects().delete(req).await.into_string(),
             },
+
+            #[cfg(feature = "internal")]
+            Command::Vault(cmd) => match cmd {
+                _ => todo!(),
+            },
         }
     }
 

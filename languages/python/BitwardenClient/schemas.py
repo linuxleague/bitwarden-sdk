@@ -1,7 +1,9 @@
 from enum import Enum
 from dataclasses import dataclass
-from typing import Any, Optional, List, TypeVar, Type, Callable, cast
+from typing import Any, Optional, List, Union, TypeVar, Type, Callable, cast
 from uuid import UUID
+from datetime import datetime
+import dateutil.parser
 
 
 T = TypeVar("T")
@@ -45,6 +47,10 @@ def to_class(c: Type[T], x: Any) -> dict:
 def from_bool(x: Any) -> bool:
     assert isinstance(x, bool)
     return x
+
+
+def from_datetime(x: Any) -> datetime:
+    return dateutil.parser.parse(x)
 
 
 class DeviceType(Enum):
@@ -580,6 +586,261 @@ class SyncRequest:
 
 
 @dataclass
+class FolderCreateRequest:
+    name: str
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'FolderCreateRequest':
+        assert isinstance(obj, dict)
+        name = from_str(obj.get("name"))
+        return FolderCreateRequest(name)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        result["name"] = from_str(self.name)
+        return result
+
+
+@dataclass
+class FolderDeleteRequest:
+    id: UUID
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'FolderDeleteRequest':
+        assert isinstance(obj, dict)
+        id = UUID(obj.get("id"))
+        return FolderDeleteRequest(id)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        result["id"] = str(self.id)
+        return result
+
+
+@dataclass
+class FolderRequest:
+    id: UUID
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'FolderRequest':
+        assert isinstance(obj, dict)
+        id = UUID(obj.get("id"))
+        return FolderRequest(id)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        result["id"] = str(self.id)
+        return result
+
+
+@dataclass
+class FolderUpdateRequest:
+    id: UUID
+    name: str
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'FolderUpdateRequest':
+        assert isinstance(obj, dict)
+        id = UUID(obj.get("id"))
+        name = from_str(obj.get("name"))
+        return FolderUpdateRequest(id, name)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        result["id"] = str(self.id)
+        result["name"] = from_str(self.name)
+        return result
+
+
+@dataclass
+class FoldersCommandClass:
+    """> Requires Authentication > Requires an unlocked vault Creates a new folder with the
+    provided data
+    
+    > Requires Authentication > Requires an unlocked vault and calling Sync at least once
+    Lists all folders in the vault
+    
+    Returns: [FoldersResponse](bitwarden::platform::folders::FoldersResponse)
+    
+    > Requires Authentication > Requires an unlocked vault Updates an existing folder with
+    the provided data given its ID
+    
+    > Requires Authentication > Requires an unlocked vault Deletes the folder associated with
+    the provided ID
+    """
+    create: Optional[FolderCreateRequest] = None
+    get: Optional[FolderRequest] = None
+    update: Optional[FolderUpdateRequest] = None
+    delete: Optional[FolderDeleteRequest] = None
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'FoldersCommandClass':
+        assert isinstance(obj, dict)
+        create = from_union([FolderCreateRequest.from_dict, from_none], obj.get("create"))
+        get = from_union([FolderRequest.from_dict, from_none], obj.get("get"))
+        update = from_union([FolderUpdateRequest.from_dict, from_none], obj.get("update"))
+        delete = from_union([FolderDeleteRequest.from_dict, from_none], obj.get("delete"))
+        return FoldersCommandClass(create, get, update, delete)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        if self.create is not None:
+            result["create"] = from_union([lambda x: to_class(FolderCreateRequest, x), from_none], self.create)
+        if self.get is not None:
+            result["get"] = from_union([lambda x: to_class(FolderRequest, x), from_none], self.get)
+        if self.update is not None:
+            result["update"] = from_union([lambda x: to_class(FolderUpdateRequest, x), from_none], self.update)
+        if self.delete is not None:
+            result["delete"] = from_union([lambda x: to_class(FolderDeleteRequest, x), from_none], self.delete)
+        return result
+
+
+class SCommand(Enum):
+    """> Requires Authentication > Requires an unlocked vault and calling Sync at least once
+    Lists all folders in the vault
+    
+    Returns: [FoldersResponse](bitwarden::platform::folders::FoldersResponse)
+    
+    > Requires Authentication > Requires an unlocked vault and calling Sync at least once
+    Lists all items in the vault
+    
+    Returns: [CipherListResponse](bitwarden::vault::cipher::CipherListResponse)
+    """
+    LIST = "list"
+
+
+@dataclass
+class CipherCreateRequest:
+    name: str
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'CipherCreateRequest':
+        assert isinstance(obj, dict)
+        name = from_str(obj.get("name"))
+        return CipherCreateRequest(name)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        result["name"] = from_str(self.name)
+        return result
+
+
+@dataclass
+class CipherDeleteRequest:
+    id: UUID
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'CipherDeleteRequest':
+        assert isinstance(obj, dict)
+        id = UUID(obj.get("id"))
+        return CipherDeleteRequest(id)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        result["id"] = str(self.id)
+        return result
+
+
+@dataclass
+class CipherRequest:
+    id: UUID
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'CipherRequest':
+        assert isinstance(obj, dict)
+        id = UUID(obj.get("id"))
+        return CipherRequest(id)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        result["id"] = str(self.id)
+        return result
+
+
+@dataclass
+class CipherUpdateRequest:
+    id: UUID
+    name: str
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'CipherUpdateRequest':
+        assert isinstance(obj, dict)
+        id = UUID(obj.get("id"))
+        name = from_str(obj.get("name"))
+        return CipherUpdateRequest(id, name)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        result["id"] = str(self.id)
+        result["name"] = from_str(self.name)
+        return result
+
+
+@dataclass
+class ItemsCommandClass:
+    """> Requires Authentication > Requires an unlocked vault Creates a new item with the
+    provided data
+    
+    > Requires Authentication > Requires an unlocked vault and calling Sync at least once
+    Retrieves a single item in the vault
+    
+    Returns: [FoldersResponse](bitwarden::platform::folders::FoldersResponse)
+    
+    > Requires Authentication > Requires an unlocked vault Updates an existing item with the
+    provided data given its ID
+    
+    > Requires Authentication > Requires an unlocked vault Deletes the item associated with
+    the provided ID
+    """
+    create: Optional[CipherCreateRequest] = None
+    get: Optional[CipherRequest] = None
+    update: Optional[CipherUpdateRequest] = None
+    delete: Optional[CipherDeleteRequest] = None
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'ItemsCommandClass':
+        assert isinstance(obj, dict)
+        create = from_union([CipherCreateRequest.from_dict, from_none], obj.get("create"))
+        get = from_union([CipherRequest.from_dict, from_none], obj.get("get"))
+        update = from_union([CipherUpdateRequest.from_dict, from_none], obj.get("update"))
+        delete = from_union([CipherDeleteRequest.from_dict, from_none], obj.get("delete"))
+        return ItemsCommandClass(create, get, update, delete)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        if self.create is not None:
+            result["create"] = from_union([lambda x: to_class(CipherCreateRequest, x), from_none], self.create)
+        if self.get is not None:
+            result["get"] = from_union([lambda x: to_class(CipherRequest, x), from_none], self.get)
+        if self.update is not None:
+            result["update"] = from_union([lambda x: to_class(CipherUpdateRequest, x), from_none], self.update)
+        if self.delete is not None:
+            result["delete"] = from_union([lambda x: to_class(CipherDeleteRequest, x), from_none], self.delete)
+        return result
+
+
+@dataclass
+class VaultCommand:
+    folders: Optional[Union[FoldersCommandClass, SCommand]] = None
+    items: Optional[Union[ItemsCommandClass, SCommand]] = None
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'VaultCommand':
+        assert isinstance(obj, dict)
+        folders = from_union([FoldersCommandClass.from_dict, SCommand, from_none], obj.get("folders"))
+        items = from_union([ItemsCommandClass.from_dict, SCommand, from_none], obj.get("items"))
+        return VaultCommand(folders, items)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        if self.folders is not None:
+            result["folders"] = from_union([lambda x: to_class(FoldersCommandClass, x), lambda x: to_enum(SCommand, x), from_none], self.folders)
+        if self.items is not None:
+            result["items"] = from_union([lambda x: to_class(ItemsCommandClass, x), lambda x: to_enum(SCommand, x), from_none], self.items)
+        return result
+
+
+@dataclass
 class Command:
     """Login with username and password
     
@@ -625,6 +886,7 @@ class Command:
     sync: Optional[SyncRequest] = None
     secrets: Optional[SecretsCommand] = None
     projects: Optional[ProjectsCommand] = None
+    vault: Optional[VaultCommand] = None
 
     @staticmethod
     def from_dict(obj: Any) -> 'Command':
@@ -637,7 +899,8 @@ class Command:
         sync = from_union([SyncRequest.from_dict, from_none], obj.get("sync"))
         secrets = from_union([SecretsCommand.from_dict, from_none], obj.get("secrets"))
         projects = from_union([ProjectsCommand.from_dict, from_none], obj.get("projects"))
-        return Command(password_login, api_key_login, access_token_login, get_user_api_key, fingerprint, sync, secrets, projects)
+        vault = from_union([VaultCommand.from_dict, from_none], obj.get("vault"))
+        return Command(password_login, api_key_login, access_token_login, get_user_api_key, fingerprint, sync, secrets, projects, vault)
 
     def to_dict(self) -> dict:
         result: dict = {}
@@ -657,6 +920,8 @@ class Command:
             result["secrets"] = from_union([lambda x: to_class(SecretsCommand, x), from_none], self.secrets)
         if self.projects is not None:
             result["projects"] = from_union([lambda x: to_class(ProjectsCommand, x), from_none], self.projects)
+        if self.vault is not None:
+            result["vault"] = from_union([lambda x: to_class(VaultCommand, x), from_none], self.vault)
         return result
 
 
@@ -852,6 +1117,620 @@ class ResponseForAPIKeyLoginResponse:
         result["success"] = from_bool(self.success)
         if self.data is not None:
             result["data"] = from_union([lambda x: to_class(APIKeyLoginResponse, x), from_none], self.data)
+        if self.error_message is not None:
+            result["errorMessage"] = from_union([from_none, from_str], self.error_message)
+        return result
+
+
+class CipherRepromptType(Enum):
+    NONE = "None"
+    PASSWORD = "Password"
+
+
+class CipherType(Enum):
+    CARD = "Card"
+    IDENTITY = "Identity"
+    LOGIN = "Login"
+    SECURE_NOTE = "SecureNote"
+
+
+@dataclass
+class CipherListView:
+    collection_ids: List[UUID]
+    creation_date: datetime
+    favorite: bool
+    id: UUID
+    name: str
+    reprompt: CipherRepromptType
+    revision_date: datetime
+    type: CipherType
+    deleted_date: Optional[datetime] = None
+    folder_id: Optional[UUID] = None
+    organization_id: Optional[UUID] = None
+    sub_title: Optional[str] = None
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'CipherListView':
+        assert isinstance(obj, dict)
+        collection_ids = from_list(lambda x: UUID(x), obj.get("collectionIds"))
+        creation_date = from_datetime(obj.get("creationDate"))
+        favorite = from_bool(obj.get("favorite"))
+        id = UUID(obj.get("id"))
+        name = from_str(obj.get("name"))
+        reprompt = CipherRepromptType(obj.get("reprompt"))
+        revision_date = from_datetime(obj.get("revisionDate"))
+        type = CipherType(obj.get("type"))
+        deleted_date = from_union([from_none, from_datetime], obj.get("deletedDate"))
+        folder_id = from_union([from_none, lambda x: UUID(x)], obj.get("folderId"))
+        organization_id = from_union([from_none, lambda x: UUID(x)], obj.get("organizationId"))
+        sub_title = from_union([from_none, from_str], obj.get("subTitle"))
+        return CipherListView(collection_ids, creation_date, favorite, id, name, reprompt, revision_date, type, deleted_date, folder_id, organization_id, sub_title)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        result["collectionIds"] = from_list(lambda x: str(x), self.collection_ids)
+        result["creationDate"] = self.creation_date.isoformat()
+        result["favorite"] = from_bool(self.favorite)
+        result["id"] = str(self.id)
+        result["name"] = from_str(self.name)
+        result["reprompt"] = to_enum(CipherRepromptType, self.reprompt)
+        result["revisionDate"] = self.revision_date.isoformat()
+        result["type"] = to_enum(CipherType, self.type)
+        if self.deleted_date is not None:
+            result["deletedDate"] = from_union([from_none, lambda x: x.isoformat()], self.deleted_date)
+        if self.folder_id is not None:
+            result["folderId"] = from_union([from_none, lambda x: str(x)], self.folder_id)
+        if self.organization_id is not None:
+            result["organizationId"] = from_union([from_none, lambda x: str(x)], self.organization_id)
+        if self.sub_title is not None:
+            result["subTitle"] = from_union([from_none, from_str], self.sub_title)
+        return result
+
+
+@dataclass
+class CipherListResponse:
+    ciphers: List[CipherListView]
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'CipherListResponse':
+        assert isinstance(obj, dict)
+        ciphers = from_list(CipherListView.from_dict, obj.get("ciphers"))
+        return CipherListResponse(ciphers)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        result["ciphers"] = from_list(lambda x: to_class(CipherListView, x), self.ciphers)
+        return result
+
+
+@dataclass
+class ResponseForCipherListResponse:
+    """Whether or not the SDK request succeeded."""
+    success: bool
+    """The response data. Populated if `success` is true."""
+    data: Optional[CipherListResponse] = None
+    """A message for any error that may occur. Populated if `success` is false."""
+    error_message: Optional[str] = None
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'ResponseForCipherListResponse':
+        assert isinstance(obj, dict)
+        success = from_bool(obj.get("success"))
+        data = from_union([CipherListResponse.from_dict, from_none], obj.get("data"))
+        error_message = from_union([from_none, from_str], obj.get("errorMessage"))
+        return ResponseForCipherListResponse(success, data, error_message)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        result["success"] = from_bool(self.success)
+        if self.data is not None:
+            result["data"] = from_union([lambda x: to_class(CipherListResponse, x), from_none], self.data)
+        if self.error_message is not None:
+            result["errorMessage"] = from_union([from_none, from_str], self.error_message)
+        return result
+
+
+@dataclass
+class AttachmentView:
+    file_name: Optional[str] = None
+    id: Optional[str] = None
+    key: Optional[str] = None
+    size: Optional[str] = None
+    size_name: Optional[str] = None
+    url: Optional[str] = None
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'AttachmentView':
+        assert isinstance(obj, dict)
+        file_name = from_union([from_none, from_str], obj.get("fileName"))
+        id = from_union([from_none, from_str], obj.get("id"))
+        key = from_union([from_none, from_str], obj.get("key"))
+        size = from_union([from_none, from_str], obj.get("size"))
+        size_name = from_union([from_none, from_str], obj.get("sizeName"))
+        url = from_union([from_none, from_str], obj.get("url"))
+        return AttachmentView(file_name, id, key, size, size_name, url)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        if self.file_name is not None:
+            result["fileName"] = from_union([from_none, from_str], self.file_name)
+        if self.id is not None:
+            result["id"] = from_union([from_none, from_str], self.id)
+        if self.key is not None:
+            result["key"] = from_union([from_none, from_str], self.key)
+        if self.size is not None:
+            result["size"] = from_union([from_none, from_str], self.size)
+        if self.size_name is not None:
+            result["sizeName"] = from_union([from_none, from_str], self.size_name)
+        if self.url is not None:
+            result["url"] = from_union([from_none, from_str], self.url)
+        return result
+
+
+@dataclass
+class CardView:
+    brand: Optional[str] = None
+    cardholder_name: Optional[str] = None
+    code: Optional[str] = None
+    exp_month: Optional[str] = None
+    exp_year: Optional[str] = None
+    number: Optional[str] = None
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'CardView':
+        assert isinstance(obj, dict)
+        brand = from_union([from_none, from_str], obj.get("brand"))
+        cardholder_name = from_union([from_none, from_str], obj.get("cardholderName"))
+        code = from_union([from_none, from_str], obj.get("code"))
+        exp_month = from_union([from_none, from_str], obj.get("expMonth"))
+        exp_year = from_union([from_none, from_str], obj.get("expYear"))
+        number = from_union([from_none, from_str], obj.get("number"))
+        return CardView(brand, cardholder_name, code, exp_month, exp_year, number)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        if self.brand is not None:
+            result["brand"] = from_union([from_none, from_str], self.brand)
+        if self.cardholder_name is not None:
+            result["cardholderName"] = from_union([from_none, from_str], self.cardholder_name)
+        if self.code is not None:
+            result["code"] = from_union([from_none, from_str], self.code)
+        if self.exp_month is not None:
+            result["expMonth"] = from_union([from_none, from_str], self.exp_month)
+        if self.exp_year is not None:
+            result["expYear"] = from_union([from_none, from_str], self.exp_year)
+        if self.number is not None:
+            result["number"] = from_union([from_none, from_str], self.number)
+        return result
+
+
+class CardLinkedID(Enum):
+    BRAND = "brand"
+    CARDHOLDER_NAME = "cardholderName"
+    CODE = "code"
+    EXP_MONTH = "expMonth"
+    EXP_YEAR = "expYear"
+    NUMBER = "number"
+
+
+class IdentityLinkedID(Enum):
+    ADDRESS1 = "address1"
+    ADDRESS2 = "address2"
+    ADDRESS3 = "address3"
+    CITY = "city"
+    COMPANY = "company"
+    COUNTRY = "country"
+    EMAIL = "email"
+    FIRST_NAME = "firstName"
+    FULL_NAME = "fullName"
+    LAST_NAME = "lastName"
+    LICENSE_NUMBER = "licenseNumber"
+    MIDDLE_NAME = "middleName"
+    PASSPORT_NUMBER = "passportNumber"
+    PHONE = "phone"
+    POSTAL_CODE = "postalCode"
+    SSN = "ssn"
+    STATE = "state"
+    TITLE = "title"
+    USERNAME = "username"
+
+
+class LoginLinkedID(Enum):
+    PASSWORD = "password"
+    USERNAME = "username"
+
+
+@dataclass
+class LinkedIDType:
+    login_linked_id: Optional[LoginLinkedID] = None
+    card_linked_id: Optional[CardLinkedID] = None
+    identity_linked_id: Optional[IdentityLinkedID] = None
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'LinkedIDType':
+        assert isinstance(obj, dict)
+        login_linked_id = from_union([LoginLinkedID, from_none], obj.get("loginLinkedId"))
+        card_linked_id = from_union([CardLinkedID, from_none], obj.get("cardLinkedId"))
+        identity_linked_id = from_union([IdentityLinkedID, from_none], obj.get("identityLinkedId"))
+        return LinkedIDType(login_linked_id, card_linked_id, identity_linked_id)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        if self.login_linked_id is not None:
+            result["loginLinkedId"] = from_union([lambda x: to_enum(LoginLinkedID, x), from_none], self.login_linked_id)
+        if self.card_linked_id is not None:
+            result["cardLinkedId"] = from_union([lambda x: to_enum(CardLinkedID, x), from_none], self.card_linked_id)
+        if self.identity_linked_id is not None:
+            result["identityLinkedId"] = from_union([lambda x: to_enum(IdentityLinkedID, x), from_none], self.identity_linked_id)
+        return result
+
+
+class FieldType(Enum):
+    BOOLEAN = "boolean"
+    HIDDEN = "hidden"
+    LINKED = "linked"
+    TEXT = "text"
+
+
+@dataclass
+class FieldView:
+    show_count: bool
+    show_value: bool
+    type: FieldType
+    linked_id: Optional[LinkedIDType] = None
+    name: Optional[str] = None
+    value: Optional[str] = None
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'FieldView':
+        assert isinstance(obj, dict)
+        show_count = from_bool(obj.get("showCount"))
+        show_value = from_bool(obj.get("showValue"))
+        type = FieldType(obj.get("type"))
+        linked_id = from_union([LinkedIDType.from_dict, from_none], obj.get("linkedId"))
+        name = from_union([from_none, from_str], obj.get("name"))
+        value = from_union([from_none, from_str], obj.get("value"))
+        return FieldView(show_count, show_value, type, linked_id, name, value)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        result["showCount"] = from_bool(self.show_count)
+        result["showValue"] = from_bool(self.show_value)
+        result["type"] = to_enum(FieldType, self.type)
+        if self.linked_id is not None:
+            result["linkedId"] = from_union([lambda x: to_class(LinkedIDType, x), from_none], self.linked_id)
+        if self.name is not None:
+            result["name"] = from_union([from_none, from_str], self.name)
+        if self.value is not None:
+            result["value"] = from_union([from_none, from_str], self.value)
+        return result
+
+
+@dataclass
+class IdentityView:
+    address1: Optional[str] = None
+    address2: Optional[str] = None
+    address3: Optional[str] = None
+    city: Optional[str] = None
+    company: Optional[str] = None
+    country: Optional[str] = None
+    email: Optional[str] = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    license_number: Optional[str] = None
+    middle_name: Optional[str] = None
+    passport_number: Optional[str] = None
+    phone: Optional[str] = None
+    postal_code: Optional[str] = None
+    ssn: Optional[str] = None
+    state: Optional[str] = None
+    title: Optional[str] = None
+    username: Optional[str] = None
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'IdentityView':
+        assert isinstance(obj, dict)
+        address1 = from_union([from_none, from_str], obj.get("address1"))
+        address2 = from_union([from_none, from_str], obj.get("address2"))
+        address3 = from_union([from_none, from_str], obj.get("address3"))
+        city = from_union([from_none, from_str], obj.get("city"))
+        company = from_union([from_none, from_str], obj.get("company"))
+        country = from_union([from_none, from_str], obj.get("country"))
+        email = from_union([from_none, from_str], obj.get("email"))
+        first_name = from_union([from_none, from_str], obj.get("firstName"))
+        last_name = from_union([from_none, from_str], obj.get("lastName"))
+        license_number = from_union([from_none, from_str], obj.get("licenseNumber"))
+        middle_name = from_union([from_none, from_str], obj.get("middleName"))
+        passport_number = from_union([from_none, from_str], obj.get("passportNumber"))
+        phone = from_union([from_none, from_str], obj.get("phone"))
+        postal_code = from_union([from_none, from_str], obj.get("postalCode"))
+        ssn = from_union([from_none, from_str], obj.get("ssn"))
+        state = from_union([from_none, from_str], obj.get("state"))
+        title = from_union([from_none, from_str], obj.get("title"))
+        username = from_union([from_none, from_str], obj.get("username"))
+        return IdentityView(address1, address2, address3, city, company, country, email, first_name, last_name, license_number, middle_name, passport_number, phone, postal_code, ssn, state, title, username)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        if self.address1 is not None:
+            result["address1"] = from_union([from_none, from_str], self.address1)
+        if self.address2 is not None:
+            result["address2"] = from_union([from_none, from_str], self.address2)
+        if self.address3 is not None:
+            result["address3"] = from_union([from_none, from_str], self.address3)
+        if self.city is not None:
+            result["city"] = from_union([from_none, from_str], self.city)
+        if self.company is not None:
+            result["company"] = from_union([from_none, from_str], self.company)
+        if self.country is not None:
+            result["country"] = from_union([from_none, from_str], self.country)
+        if self.email is not None:
+            result["email"] = from_union([from_none, from_str], self.email)
+        if self.first_name is not None:
+            result["firstName"] = from_union([from_none, from_str], self.first_name)
+        if self.last_name is not None:
+            result["lastName"] = from_union([from_none, from_str], self.last_name)
+        if self.license_number is not None:
+            result["licenseNumber"] = from_union([from_none, from_str], self.license_number)
+        if self.middle_name is not None:
+            result["middleName"] = from_union([from_none, from_str], self.middle_name)
+        if self.passport_number is not None:
+            result["passportNumber"] = from_union([from_none, from_str], self.passport_number)
+        if self.phone is not None:
+            result["phone"] = from_union([from_none, from_str], self.phone)
+        if self.postal_code is not None:
+            result["postalCode"] = from_union([from_none, from_str], self.postal_code)
+        if self.ssn is not None:
+            result["ssn"] = from_union([from_none, from_str], self.ssn)
+        if self.state is not None:
+            result["state"] = from_union([from_none, from_str], self.state)
+        if self.title is not None:
+            result["title"] = from_union([from_none, from_str], self.title)
+        if self.username is not None:
+            result["username"] = from_union([from_none, from_str], self.username)
+        return result
+
+
+class URIMatchType(Enum):
+    DOMAIN = "domain"
+    EXACT = "exact"
+    HOST = "host"
+    NEVER = "never"
+    REGULAR_EXPRESSION = "regularExpression"
+    STARTS_WITH = "startsWith"
+
+
+@dataclass
+class LoginURIView:
+    match: URIMatchType
+    uri: str
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'LoginURIView':
+        assert isinstance(obj, dict)
+        match = URIMatchType(obj.get("match"))
+        uri = from_str(obj.get("uri"))
+        return LoginURIView(match, uri)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        result["match"] = to_enum(URIMatchType, self.match)
+        result["uri"] = from_str(self.uri)
+        return result
+
+
+@dataclass
+class LoginView:
+    autofill_on_page_load: bool
+    password: str
+    uris: List[LoginURIView]
+    username: str
+    password_revision_date: Optional[datetime] = None
+    totp: Optional[str] = None
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'LoginView':
+        assert isinstance(obj, dict)
+        autofill_on_page_load = from_bool(obj.get("autofillOnPageLoad"))
+        password = from_str(obj.get("password"))
+        uris = from_list(LoginURIView.from_dict, obj.get("uris"))
+        username = from_str(obj.get("username"))
+        password_revision_date = from_union([from_none, from_datetime], obj.get("passwordRevisionDate"))
+        totp = from_union([from_none, from_str], obj.get("totp"))
+        return LoginView(autofill_on_page_load, password, uris, username, password_revision_date, totp)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        result["autofillOnPageLoad"] = from_bool(self.autofill_on_page_load)
+        result["password"] = from_str(self.password)
+        result["uris"] = from_list(lambda x: to_class(LoginURIView, x), self.uris)
+        result["username"] = from_str(self.username)
+        if self.password_revision_date is not None:
+            result["passwordRevisionDate"] = from_union([from_none, lambda x: x.isoformat()], self.password_revision_date)
+        if self.totp is not None:
+            result["totp"] = from_union([from_none, from_str], self.totp)
+        return result
+
+
+@dataclass
+class PasswordHistoryView:
+    last_used_date: datetime
+    password: str
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'PasswordHistoryView':
+        assert isinstance(obj, dict)
+        last_used_date = from_datetime(obj.get("lastUsedDate"))
+        password = from_str(obj.get("password"))
+        return PasswordHistoryView(last_used_date, password)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        result["lastUsedDate"] = self.last_used_date.isoformat()
+        result["password"] = from_str(self.password)
+        return result
+
+
+@dataclass
+class CipherView:
+    attachments: List[AttachmentView]
+    collection_ids: List[UUID]
+    creation_date: datetime
+    favorite: bool
+    fields: List[FieldView]
+    id: UUID
+    name: str
+    notes: str
+    password_history: List[PasswordHistoryView]
+    reprompt: CipherRepromptType
+    revision_date: datetime
+    type: CipherType
+    card: Optional[CardView] = None
+    deleted_date: Optional[datetime] = None
+    folder_id: Optional[UUID] = None
+    identity: Optional[IdentityView] = None
+    login: Optional[LoginView] = None
+    organization_id: Optional[UUID] = None
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'CipherView':
+        assert isinstance(obj, dict)
+        attachments = from_list(AttachmentView.from_dict, obj.get("attachments"))
+        collection_ids = from_list(lambda x: UUID(x), obj.get("collectionIds"))
+        creation_date = from_datetime(obj.get("creationDate"))
+        favorite = from_bool(obj.get("favorite"))
+        fields = from_list(FieldView.from_dict, obj.get("fields"))
+        id = UUID(obj.get("id"))
+        name = from_str(obj.get("name"))
+        notes = from_str(obj.get("notes"))
+        password_history = from_list(PasswordHistoryView.from_dict, obj.get("passwordHistory"))
+        reprompt = CipherRepromptType(obj.get("reprompt"))
+        revision_date = from_datetime(obj.get("revisionDate"))
+        type = CipherType(obj.get("type"))
+        card = from_union([CardView.from_dict, from_none], obj.get("card"))
+        deleted_date = from_union([from_none, from_datetime], obj.get("deletedDate"))
+        folder_id = from_union([from_none, lambda x: UUID(x)], obj.get("folderId"))
+        identity = from_union([IdentityView.from_dict, from_none], obj.get("identity"))
+        login = from_union([LoginView.from_dict, from_none], obj.get("login"))
+        organization_id = from_union([from_none, lambda x: UUID(x)], obj.get("organizationId"))
+        return CipherView(attachments, collection_ids, creation_date, favorite, fields, id, name, notes, password_history, reprompt, revision_date, type, card, deleted_date, folder_id, identity, login, organization_id)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        result["attachments"] = from_list(lambda x: to_class(AttachmentView, x), self.attachments)
+        result["collectionIds"] = from_list(lambda x: str(x), self.collection_ids)
+        result["creationDate"] = self.creation_date.isoformat()
+        result["favorite"] = from_bool(self.favorite)
+        result["fields"] = from_list(lambda x: to_class(FieldView, x), self.fields)
+        result["id"] = str(self.id)
+        result["name"] = from_str(self.name)
+        result["notes"] = from_str(self.notes)
+        result["passwordHistory"] = from_list(lambda x: to_class(PasswordHistoryView, x), self.password_history)
+        result["reprompt"] = to_enum(CipherRepromptType, self.reprompt)
+        result["revisionDate"] = self.revision_date.isoformat()
+        result["type"] = to_enum(CipherType, self.type)
+        if self.card is not None:
+            result["card"] = from_union([lambda x: to_class(CardView, x), from_none], self.card)
+        if self.deleted_date is not None:
+            result["deletedDate"] = from_union([from_none, lambda x: x.isoformat()], self.deleted_date)
+        if self.folder_id is not None:
+            result["folderId"] = from_union([from_none, lambda x: str(x)], self.folder_id)
+        if self.identity is not None:
+            result["identity"] = from_union([lambda x: to_class(IdentityView, x), from_none], self.identity)
+        if self.login is not None:
+            result["login"] = from_union([lambda x: to_class(LoginView, x), from_none], self.login)
+        if self.organization_id is not None:
+            result["organizationId"] = from_union([from_none, lambda x: str(x)], self.organization_id)
+        return result
+
+
+@dataclass
+class ResponseForCipherView:
+    """Whether or not the SDK request succeeded."""
+    success: bool
+    """The response data. Populated if `success` is true."""
+    data: Optional[CipherView] = None
+    """A message for any error that may occur. Populated if `success` is false."""
+    error_message: Optional[str] = None
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'ResponseForCipherView':
+        assert isinstance(obj, dict)
+        success = from_bool(obj.get("success"))
+        data = from_union([CipherView.from_dict, from_none], obj.get("data"))
+        error_message = from_union([from_none, from_str], obj.get("errorMessage"))
+        return ResponseForCipherView(success, data, error_message)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        result["success"] = from_bool(self.success)
+        if self.data is not None:
+            result["data"] = from_union([lambda x: to_class(CipherView, x), from_none], self.data)
+        if self.error_message is not None:
+            result["errorMessage"] = from_union([from_none, from_str], self.error_message)
+        return result
+
+
+@dataclass
+class FolderView:
+    id: UUID
+    name: str
+    revision_date: datetime
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'FolderView':
+        assert isinstance(obj, dict)
+        id = UUID(obj.get("id"))
+        name = from_str(obj.get("name"))
+        revision_date = from_datetime(obj.get("revisionDate"))
+        return FolderView(id, name, revision_date)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        result["id"] = str(self.id)
+        result["name"] = from_str(self.name)
+        result["revisionDate"] = self.revision_date.isoformat()
+        return result
+
+
+@dataclass
+class FolderResponse:
+    folder: FolderView
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'FolderResponse':
+        assert isinstance(obj, dict)
+        folder = FolderView.from_dict(obj.get("folder"))
+        return FolderResponse(folder)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        result["folder"] = to_class(FolderView, self.folder)
+        return result
+
+
+@dataclass
+class ResponseForFolderResponse:
+    """Whether or not the SDK request succeeded."""
+    success: bool
+    """The response data. Populated if `success` is true."""
+    data: Optional[FolderResponse] = None
+    """A message for any error that may occur. Populated if `success` is false."""
+    error_message: Optional[str] = None
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'ResponseForFolderResponse':
+        assert isinstance(obj, dict)
+        success = from_bool(obj.get("success"))
+        data = from_union([FolderResponse.from_dict, from_none], obj.get("data"))
+        error_message = from_union([from_none, from_str], obj.get("errorMessage"))
+        return ResponseForFolderResponse(success, data, error_message)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        result["success"] = from_bool(self.success)
+        if self.data is not None:
+            result["data"] = from_union([lambda x: to_class(FolderResponse, x), from_none], self.data)
         if self.error_message is not None:
             result["errorMessage"] = from_union([from_none, from_str], self.error_message)
         return result
@@ -1277,6 +2156,158 @@ class ResponseForSecretsDeleteResponse:
         return result
 
 
+@dataclass
+class CipherDetailsResponse:
+    pass
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'CipherDetailsResponse':
+        assert isinstance(obj, dict)
+        return CipherDetailsResponse()
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        return result
+
+
+@dataclass
+class ProfileOrganizationResponse:
+    id: UUID
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'ProfileOrganizationResponse':
+        assert isinstance(obj, dict)
+        id = UUID(obj.get("id"))
+        return ProfileOrganizationResponse(id)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        result["id"] = str(self.id)
+        return result
+
+
+@dataclass
+class ProfileResponse:
+    """Data about the user, including their encryption keys and the organizations they are a
+    part of
+    """
+    email: str
+    id: UUID
+    name: str
+    organizations: List[ProfileOrganizationResponse]
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'ProfileResponse':
+        assert isinstance(obj, dict)
+        email = from_str(obj.get("email"))
+        id = UUID(obj.get("id"))
+        name = from_str(obj.get("name"))
+        organizations = from_list(ProfileOrganizationResponse.from_dict, obj.get("organizations"))
+        return ProfileResponse(email, id, name, organizations)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        result["email"] = from_str(self.email)
+        result["id"] = str(self.id)
+        result["name"] = from_str(self.name)
+        result["organizations"] = from_list(lambda x: to_class(ProfileOrganizationResponse, x), self.organizations)
+        return result
+
+
+@dataclass
+class SyncResponse:
+    """List of ciphers accesible by the user"""
+    ciphers: List[CipherDetailsResponse]
+    """Data about the user, including their encryption keys and the organizations they are a
+    part of
+    """
+    profile: ProfileResponse
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'SyncResponse':
+        assert isinstance(obj, dict)
+        ciphers = from_list(CipherDetailsResponse.from_dict, obj.get("ciphers"))
+        profile = ProfileResponse.from_dict(obj.get("profile"))
+        return SyncResponse(ciphers, profile)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        result["ciphers"] = from_list(lambda x: to_class(CipherDetailsResponse, x), self.ciphers)
+        result["profile"] = to_class(ProfileResponse, self.profile)
+        return result
+
+
+@dataclass
+class ResponseForSyncResponse:
+    """Whether or not the SDK request succeeded."""
+    success: bool
+    """The response data. Populated if `success` is true."""
+    data: Optional[SyncResponse] = None
+    """A message for any error that may occur. Populated if `success` is false."""
+    error_message: Optional[str] = None
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'ResponseForSyncResponse':
+        assert isinstance(obj, dict)
+        success = from_bool(obj.get("success"))
+        data = from_union([SyncResponse.from_dict, from_none], obj.get("data"))
+        error_message = from_union([from_none, from_str], obj.get("errorMessage"))
+        return ResponseForSyncResponse(success, data, error_message)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        result["success"] = from_bool(self.success)
+        if self.data is not None:
+            result["data"] = from_union([lambda x: to_class(SyncResponse, x), from_none], self.data)
+        if self.error_message is not None:
+            result["errorMessage"] = from_union([from_none, from_str], self.error_message)
+        return result
+
+
+@dataclass
+class UserAPIKeyResponse:
+    """The user's API key, which represents the client_secret portion of an oauth request."""
+    api_key: str
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'UserAPIKeyResponse':
+        assert isinstance(obj, dict)
+        api_key = from_str(obj.get("apiKey"))
+        return UserAPIKeyResponse(api_key)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        result["apiKey"] = from_str(self.api_key)
+        return result
+
+
+@dataclass
+class ResponseForUserAPIKeyResponse:
+    """Whether or not the SDK request succeeded."""
+    success: bool
+    """The response data. Populated if `success` is true."""
+    data: Optional[UserAPIKeyResponse] = None
+    """A message for any error that may occur. Populated if `success` is false."""
+    error_message: Optional[str] = None
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'ResponseForUserAPIKeyResponse':
+        assert isinstance(obj, dict)
+        success = from_bool(obj.get("success"))
+        data = from_union([UserAPIKeyResponse.from_dict, from_none], obj.get("data"))
+        error_message = from_union([from_none, from_str], obj.get("errorMessage"))
+        return ResponseForUserAPIKeyResponse(success, data, error_message)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        result["success"] = from_bool(self.success)
+        if self.data is not None:
+            result["data"] = from_union([lambda x: to_class(UserAPIKeyResponse, x), from_none], self.data)
+        if self.error_message is not None:
+            result["errorMessage"] = from_union([from_none, from_str], self.error_message)
+        return result
+
+
 def client_settings_from_dict(s: Any) -> ClientSettings:
     return ClientSettings.from_dict(s)
 
@@ -1299,6 +2330,30 @@ def response_for_api_key_login_response_from_dict(s: Any) -> ResponseForAPIKeyLo
 
 def response_for_api_key_login_response_to_dict(x: ResponseForAPIKeyLoginResponse) -> Any:
     return to_class(ResponseForAPIKeyLoginResponse, x)
+
+
+def response_for_cipher_list_response_from_dict(s: Any) -> ResponseForCipherListResponse:
+    return ResponseForCipherListResponse.from_dict(s)
+
+
+def response_for_cipher_list_response_to_dict(x: ResponseForCipherListResponse) -> Any:
+    return to_class(ResponseForCipherListResponse, x)
+
+
+def response_for_cipher_view_from_dict(s: Any) -> ResponseForCipherView:
+    return ResponseForCipherView.from_dict(s)
+
+
+def response_for_cipher_view_to_dict(x: ResponseForCipherView) -> Any:
+    return to_class(ResponseForCipherView, x)
+
+
+def response_for_folder_response_from_dict(s: Any) -> ResponseForFolderResponse:
+    return ResponseForFolderResponse.from_dict(s)
+
+
+def response_for_folder_response_to_dict(x: ResponseForFolderResponse) -> Any:
+    return to_class(ResponseForFolderResponse, x)
 
 
 def response_for_password_login_response_from_dict(s: Any) -> ResponseForPasswordLoginResponse:
@@ -1331,4 +2386,20 @@ def response_for_secrets_delete_response_from_dict(s: Any) -> ResponseForSecrets
 
 def response_for_secrets_delete_response_to_dict(x: ResponseForSecretsDeleteResponse) -> Any:
     return to_class(ResponseForSecretsDeleteResponse, x)
+
+
+def response_for_sync_response_from_dict(s: Any) -> ResponseForSyncResponse:
+    return ResponseForSyncResponse.from_dict(s)
+
+
+def response_for_sync_response_to_dict(x: ResponseForSyncResponse) -> Any:
+    return to_class(ResponseForSyncResponse, x)
+
+
+def response_for_user_api_key_response_from_dict(s: Any) -> ResponseForUserAPIKeyResponse:
+    return ResponseForUserAPIKeyResponse.from_dict(s)
+
+
+def response_for_user_api_key_response_to_dict(x: ResponseForUserAPIKeyResponse) -> Any:
+    return to_class(ResponseForUserAPIKeyResponse, x)
 

@@ -1,0 +1,140 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Response_for_CipherListResponse",
+  "type": "object",
+  "required": [
+    "success"
+  ],
+  "properties": {
+    "data": {
+      "description": "The response data. Populated if `success` is true.",
+      "anyOf": [
+        {
+          "$ref": "#/definitions/CipherListResponse"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "errorMessage": {
+      "description": "A message for any error that may occur. Populated if `success` is false.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "success": {
+      "description": "Whether or not the SDK request succeeded.",
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "CipherListResponse": {
+      "type": "object",
+      "required": [
+        "ciphers"
+      ],
+      "properties": {
+        "ciphers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CipherListView"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "CipherListView": {
+      "type": "object",
+      "required": [
+        "collectionIds",
+        "creationDate",
+        "favorite",
+        "id",
+        "name",
+        "reprompt",
+        "revisionDate",
+        "type"
+      ],
+      "properties": {
+        "collectionIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "creationDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "deletedDate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "favorite": {
+          "type": "boolean"
+        },
+        "folderId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "name": {
+          "type": "string"
+        },
+        "organizationId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "reprompt": {
+          "$ref": "#/definitions/CipherRepromptType"
+        },
+        "revisionDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "subTitle": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "type": {
+          "$ref": "#/definitions/CipherType"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CipherRepromptType": {
+      "type": "string",
+      "enum": [
+        "None",
+        "Password"
+      ]
+    },
+    "CipherType": {
+      "type": "string",
+      "enum": [
+        "Login",
+        "SecureNote",
+        "Card",
+        "Identity"
+      ]
+    }
+  }
+}

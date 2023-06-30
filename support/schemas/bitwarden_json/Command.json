@@ -103,6 +103,18 @@
         }
       },
       "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "vault"
+      ],
+      "properties": {
+        "vault": {
+          "$ref": "#/definitions/VaultCommand"
+        }
+      },
+      "additionalProperties": false
     }
   ],
   "definitions": {
@@ -144,6 +156,61 @@
       },
       "additionalProperties": false
     },
+    "CipherCreateRequest": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CipherDeleteRequest": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CipherRequest": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CipherUpdateRequest": {
+      "type": "object",
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
     "FingerprintRequest": {
       "type": "object",
       "required": [
@@ -161,6 +228,187 @@
         }
       },
       "additionalProperties": false
+    },
+    "FolderCreateRequest": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "FolderDeleteRequest": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "additionalProperties": false
+    },
+    "FolderRequest": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "additionalProperties": false
+    },
+    "FolderUpdateRequest": {
+      "type": "object",
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "FoldersCommand": {
+      "oneOf": [
+        {
+          "description": "> Requires Authentication > Requires an unlocked vault Creates a new folder with the provided data",
+          "type": "object",
+          "required": [
+            "create"
+          ],
+          "properties": {
+            "create": {
+              "$ref": "#/definitions/FolderCreateRequest"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "description": "> Requires Authentication > Requires an unlocked vault and calling Sync at least once Lists all folders in the vault\n\nReturns: [FoldersResponse](bitwarden::platform::folders::FoldersResponse)",
+          "type": "string",
+          "enum": [
+            "list"
+          ]
+        },
+        {
+          "description": "> Requires Authentication > Requires an unlocked vault and calling Sync at least once Lists all folders in the vault\n\nReturns: [FoldersResponse](bitwarden::platform::folders::FoldersResponse)",
+          "type": "object",
+          "required": [
+            "get"
+          ],
+          "properties": {
+            "get": {
+              "$ref": "#/definitions/FolderRequest"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "description": "> Requires Authentication > Requires an unlocked vault Updates an existing folder with the provided data given its ID",
+          "type": "object",
+          "required": [
+            "update"
+          ],
+          "properties": {
+            "update": {
+              "$ref": "#/definitions/FolderUpdateRequest"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "description": "> Requires Authentication > Requires an unlocked vault Deletes the folder associated with the provided ID",
+          "type": "object",
+          "required": [
+            "delete"
+          ],
+          "properties": {
+            "delete": {
+              "$ref": "#/definitions/FolderDeleteRequest"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "ItemsCommand": {
+      "oneOf": [
+        {
+          "description": "> Requires Authentication > Requires an unlocked vault Creates a new item with the provided data",
+          "type": "object",
+          "required": [
+            "create"
+          ],
+          "properties": {
+            "create": {
+              "$ref": "#/definitions/CipherCreateRequest"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "description": "> Requires Authentication > Requires an unlocked vault and calling Sync at least once Lists all items in the vault\n\nReturns: [CipherListResponse](bitwarden::vault::cipher::CipherListResponse)",
+          "type": "string",
+          "enum": [
+            "list"
+          ]
+        },
+        {
+          "description": "> Requires Authentication > Requires an unlocked vault and calling Sync at least once Retrieves a single item in the vault\n\nReturns: [FoldersResponse](bitwarden::platform::folders::FoldersResponse)",
+          "type": "object",
+          "required": [
+            "get"
+          ],
+          "properties": {
+            "get": {
+              "$ref": "#/definitions/CipherRequest"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "description": "> Requires Authentication > Requires an unlocked vault Updates an existing item with the provided data given its ID",
+          "type": "object",
+          "required": [
+            "update"
+          ],
+          "properties": {
+            "update": {
+              "$ref": "#/definitions/CipherUpdateRequest"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "description": "> Requires Authentication > Requires an unlocked vault Deletes the item associated with the provided ID",
+          "type": "object",
+          "required": [
+            "delete"
+          ],
+          "properties": {
+            "delete": {
+              "$ref": "#/definitions/CipherDeleteRequest"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
     },
     "PasswordLoginRequest": {
       "description": "Login to Bitwarden with Username and Password",
@@ -552,6 +800,34 @@
         }
       },
       "additionalProperties": false
+    },
+    "VaultCommand": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "folders"
+          ],
+          "properties": {
+            "folders": {
+              "$ref": "#/definitions/FoldersCommand"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "items"
+          ],
+          "properties": {
+            "items": {
+              "$ref": "#/definitions/ItemsCommand"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
     }
   }
 }
