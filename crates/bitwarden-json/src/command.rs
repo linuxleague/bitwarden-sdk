@@ -1,6 +1,3 @@
-use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
-
 use bitwarden::{
     auth::request::AccessTokenLoginRequest,
     secrets_manager::{
@@ -23,6 +20,8 @@ use bitwarden::{
         FolderCreateRequest, FolderDeleteRequest, FolderRequest, FolderUpdateRequest,
     },
 };
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -36,7 +35,7 @@ pub enum Command {
     ///
     /// This command is not capable of handling authentication requiring 2fa or captcha.
     ///
-    /// Returns: [PasswordLoginResponse](crate::sdk::auth::response::PasswordLoginResponse)
+    /// Returns: [PasswordLoginResponse](bitwarden::auth::response::PasswordLoginResponse)
     ///
     PasswordLogin(PasswordLoginRequest),
 
@@ -45,7 +44,7 @@ pub enum Command {
     ///
     /// This command is for initiating an authentication handshake with Bitwarden.
     ///
-    /// Returns: [ApiKeyLoginResponse](crate::sdk::auth::response::ApiKeyLoginResponse)
+    /// Returns: [ApiKeyLoginResponse](bitwarden::auth::response::ApiKeyLoginResponse)
     ///
     ApiKeyLogin(ApiKeyLoginRequest),
 
@@ -53,7 +52,7 @@ pub enum Command {
     ///
     /// This command is for initiating an authentication handshake with Bitwarden.
     ///
-    /// Returns: [ApiKeyLoginResponse](crate::sdk::auth::response::ApiKeyLoginResponse)
+    /// Returns: [ApiKeyLoginResponse](bitwarden::auth::response::ApiKeyLoginResponse)
     ///
     AccessTokenLogin(AccessTokenLoginRequest),
 
@@ -61,7 +60,7 @@ pub enum Command {
     /// > Requires Authentication
     /// Get the API key of the currently authenticated user
     ///
-    /// Returns: [UserApiKeyResponse](crate::sdk::response::user_api_key_response::UserApiKeyResponse)
+    /// Returns: [UserApiKeyResponse](bitwarden::platform::UserApiKeyResponse)
     ///
     GetUserApiKey(SecretVerificationRequest),
 
@@ -76,7 +75,7 @@ pub enum Command {
     /// > Requires Authentication
     /// Retrieve all user data, ciphers and organizations the user is a part of
     ///
-    /// Returns: [SyncResponse](crate::sdk::response::sync_response::SyncResponse)
+    /// Returns: [SyncResponse](bitwarden::platform::SyncResponse)
     ///
     Sync(SyncRequest),
 
@@ -94,7 +93,7 @@ pub enum SecretsCommand {
     /// > Requires using an Access Token for login or calling Sync at least once
     /// Retrieve a secret by the provided identifier
     ///
-    /// Returns: [SecretResponse](crate::sdk::response::secrets_response::SecretResponse)
+    /// Returns: [SecretResponse](bitwarden::secrets_manager::secrets::SecretResponse)
     ///
     Get(SecretGetRequest),
 
@@ -102,7 +101,7 @@ pub enum SecretsCommand {
     /// > Requires using an Access Token for login or calling Sync at least once
     /// Creates a new secret in the provided organization using the given data
     ///
-    /// Returns: [SecretResponse](crate::sdk::response::secrets_response::SecretResponse)
+    /// Returns: [SecretResponse](bitwarden::secrets_manager::secrets::SecretResponse)
     ///
     Create(SecretCreateRequest),
 
@@ -110,7 +109,7 @@ pub enum SecretsCommand {
     /// > Requires using an Access Token for login or calling Sync at least once
     /// Lists all secret identifiers of the given organization, to then retrieve each secret, use `CreateSecret`
     ///
-    /// Returns: [SecretIdentifiersResponse](crate::sdk::response::secrets_response::SecretIdentifiersResponse)
+    /// Returns: [SecretIdentifiersResponse](bitwarden::secrets_manager::secrets::SecretIdentifiersResponse)
     ///
     List(SecretIdentifiersRequest),
 
@@ -118,7 +117,7 @@ pub enum SecretsCommand {
     /// > Requires using an Access Token for login or calling Sync at least once
     /// Updates an existing secret with the provided ID using the given data
     ///
-    /// Returns: [SecretResponse](crate::sdk::response::secrets_response::SecretResponse)
+    /// Returns: [SecretResponse](bitwarden::secrets_manager::secrets::SecretResponse)
     ///
     Update(SecretPutRequest),
 
@@ -126,7 +125,7 @@ pub enum SecretsCommand {
     /// > Requires using an Access Token for login or calling Sync at least once
     /// Deletes all the secrets whose IDs match the provided ones
     ///
-    /// Returns: [SecretsDeleteResponse](crate::sdk::response::secrets_response::SecretsDeleteResponse)
+    /// Returns: [SecretsDeleteResponse](bitwarden::secrets_manager::secrets::SecretsDeleteResponse)
     ///
     Delete(SecretsDeleteRequest),
 }
@@ -138,7 +137,7 @@ pub enum ProjectsCommand {
     /// > Requires using an Access Token for login or calling Sync at least once
     /// Retrieve a project by the provided identifier
     ///
-    /// Returns: [ProjectResponse](crate::sdk::response::projects_response::ProjectResponse)
+    /// Returns: [ProjectResponse](bitwarden::secrets_manager::projects::ProjectResponse)
     ///
     Get(ProjectGetRequest),
 
@@ -146,7 +145,7 @@ pub enum ProjectsCommand {
     /// > Requires using an Access Token for login or calling Sync at least once
     /// Creates a new project in the provided organization using the given data
     ///
-    /// Returns: [ProjectResponse](crate::sdk::response::projects_response::ProjectResponse)
+    /// Returns: [ProjectResponse](bitwarden::secrets_manager::projects::ProjectResponse)
     ///
     Create(ProjectCreateRequest),
 
@@ -154,7 +153,7 @@ pub enum ProjectsCommand {
     /// > Requires using an Access Token for login or calling Sync at least once
     /// Lists all projects of the given organization
     ///
-    /// Returns: [ProjectsResponse](crate::sdk::response::projects_response::ProjectsResponse)
+    /// Returns: [ProjectsResponse](bitwarden::secrets_manager::projects::ProjectsResponse)
     ///
     List(ProjectsListRequest),
 
@@ -162,7 +161,7 @@ pub enum ProjectsCommand {
     /// > Requires using an Access Token for login or calling Sync at least once
     /// Updates an existing project with the provided ID using the given data
     ///
-    /// Returns: [ProjectResponse](crate::sdk::response::projects_response::ProjectResponse)
+    /// Returns: [ProjectResponse](bitwarden::secrets_manager::projects::ProjectResponse)
     ///
     Update(ProjectPutRequest),
 
@@ -170,7 +169,7 @@ pub enum ProjectsCommand {
     /// > Requires using an Access Token for login or calling Sync at least once
     /// Deletes all the projects whose IDs match the provided ones
     ///
-    /// Returns: [ProjectsDeleteResponse](crate::sdk::response::projects_response::ProjectsDeleteResponse)
+    /// Returns: [ProjectsDeleteResponse](bitwarden::secrets_manager::projects::ProjectsDeleteResponse)
     ///
     Delete(ProjectsDeleteRequest),
 }
