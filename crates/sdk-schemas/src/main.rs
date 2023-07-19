@@ -99,9 +99,14 @@ fn main() -> Result<()> {
     write_schema_for_response! {
         bitwarden::auth::response::ApiKeyLoginResponse,
         bitwarden::auth::response::PasswordLoginResponse,
+
         bitwarden::secrets_manager::secrets::SecretIdentifiersResponse,
         bitwarden::secrets_manager::secrets::SecretResponse,
         bitwarden::secrets_manager::secrets::SecretsDeleteResponse,
+
+        bitwarden::secrets_manager::projects::ProjectResponse,
+        bitwarden::secrets_manager::projects::ProjectsResponse,
+        bitwarden::secrets_manager::projects::ProjectsDeleteResponse,
     };
 
     // Same as above, but for the internal feature
@@ -109,9 +114,18 @@ fn main() -> Result<()> {
     write_schema_for_response! {
         bitwarden::platform::SyncResponse,
         bitwarden::platform::UserApiKeyResponse,
+
         bitwarden::vault::CipherListResponse,
         bitwarden::vault::CipherView,
+
+        bitwarden::vault::FolderListResponse,
         bitwarden::vault::FolderResponse,
+
+        bitwarden::vault::CollectionListResponse,
+        bitwarden::vault::CollectionResponse,
+
+        bitwarden::vault::SendListResponse,
+        bitwarden::vault::SendView,
     };
 
     Ok(())

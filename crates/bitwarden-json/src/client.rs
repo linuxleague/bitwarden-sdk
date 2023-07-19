@@ -75,6 +75,16 @@ impl Client {
             Command::Vault(cmd) => match cmd {
                 _ => todo!(),
             },
+
+            #[cfg(feature = "internal")]
+            Command::Sends(cmd) => match cmd {
+                _ => todo!(),
+            },
+
+            #[cfg(feature = "internal")]
+            Command::Generator(cmd) => match cmd {
+                _ => todo!(),
+            },
         }
     }
 

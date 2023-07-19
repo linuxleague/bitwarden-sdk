@@ -14,10 +14,14 @@ use bitwarden::{
 #[cfg(feature = "internal")]
 use bitwarden::{
     auth::request::{ApiKeyLoginRequest, PasswordLoginRequest},
-    platform::{FingerprintRequest, SecretVerificationRequest, SyncRequest},
+    platform::{
+        EmptyRequest, FingerprintRequest, PasswordGeneratorRequest, SecretVerificationRequest,
+        SyncRequest,
+    },
     vault::{
         CipherCreateRequest, CipherDeleteRequest, CipherRequest, CipherUpdateRequest,
-        FolderCreateRequest, FolderDeleteRequest, FolderRequest, FolderUpdateRequest,
+        CollectionRequest, FolderCreateRequest, FolderDeleteRequest, FolderRequest,
+        FolderUpdateRequest, SendCreateRequest, SendDeleteRequest, SendRequest, SendUpdateRequest,
     },
 };
 use schemars::JsonSchema;
@@ -84,6 +88,12 @@ pub enum Command {
 
     #[cfg(feature = "internal")]
     Vault(VaultCommand),
+
+    #[cfg(feature = "internal")]
+    Sends(SendsCommand),
+
+    #[cfg(feature = "internal")]
+    Generator(GeneratorCommand),
 }
 
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
@@ -180,6 +190,7 @@ pub enum ProjectsCommand {
 pub enum VaultCommand {
     Folders(FoldersCommand),
     Items(ItemsCommand),
+    Collections(CollectionsCommand),
 }
 
 #[cfg(feature = "internal")]
@@ -196,15 +207,15 @@ pub enum FoldersCommand {
     /// > Requires an unlocked vault and calling Sync at least once
     /// Lists all folders in the vault
     ///
-    /// Returns: [FoldersResponse](bitwarden::platform::folders::FoldersResponse)
+    /// Returns: [FolderListResponse](bitwarden::vault::FolderListResponse)
     ///
-    List,
+    List(EmptyRequest),
 
     /// > Requires Authentication
     /// > Requires an unlocked vault and calling Sync at least once
-    /// Lists all folders in the vault
+    /// Retrieves a folder item in the vault
     ///
-    /// Returns: [FoldersResponse](bitwarden::platform::folders::FoldersResponse)
+    /// Returns: [FolderResponse](bitwarden::vault::FolderResponse)
     ///
     Get(FolderRequest),
 
@@ -235,15 +246,15 @@ pub enum ItemsCommand {
     /// > Requires an unlocked vault and calling Sync at least once
     /// Lists all items in the vault
     ///
-    /// Returns: [CipherListResponse](bitwarden::vault::cipher::CipherListResponse)
+    /// Returns: [CipherListResponse](bitwarden::vault::CipherListResponse)
     ///
-    List,
+    List(EmptyRequest),
 
     /// > Requires Authentication
     /// > Requires an unlocked vault and calling Sync at least once
     /// Retrieves a single item in the vault
     ///
-    /// Returns: [FoldersResponse](bitwarden::platform::folders::FoldersResponse)
+    /// Returns: [FoldersResponse](bitwarden::vault::CipherView)
     ///
     Get(CipherRequest),
 
@@ -258,4 +269,83 @@ pub enum ItemsCommand {
     /// Deletes the item associated with the provided ID
     ///
     Delete(CipherDeleteRequest),
+}
+
+#[cfg(feature = "internal")]
+#[derive(Serialize, Deserialize, JsonSchema, Debug)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub enum CollectionsCommand {
+    /// > Requires Authentication
+    /// > Requires an unlocked vault and calling Sync at least once
+    /// Lists all collections associated with the user
+    ///
+    /// Returns: [CollectionListResponse](bitwarden::vault::CollectionListResponse)
+    ///
+    List(EmptyRequest),
+
+    /// > Requires Authentication
+    /// > Requires an unlocked vault and calling Sync at least once
+    /// Retrieves a single collection associated with the user
+    ///
+    /// Returns: [CollectionResponse](bitwarden::vault::CollectionResponse)
+    ///
+    Get(CollectionRequest),
+}
+
+#[cfg(feature = "internal")]
+#[derive(Serialize, Deserialize, JsonSchema, Debug)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub enum SendsCommand {
+    /// > Requires Authentication
+    /// > Requires an unlocked vault
+    /// Creates a new send with the provided data
+    ///
+    Create(SendCreateRequest),
+
+    /// > Requires Authentication
+    /// > Requires an unlocked vault and calling Sync at least once
+    /// Lists all sends in the vault
+    ///
+    /// Returns: [SendListResponse](bitwarden::vault::SendListResponse)
+    ///
+    List(EmptyRequest),
+
+    /// > Requires Authentication
+    /// > Requires an unlocked vault and calling Sync at least once
+    /// Retrieves a single send in the vault
+    ///
+    /// Returns: [SendView](bitwarden::vault::SendView)
+    ///
+    Get(SendRequest),
+
+    /// > Requires Authentication
+    /// > Requires an unlocked vault
+    /// Updates an existing send with the provided data given its ID
+    ///
+    Update(SendUpdateRequest),
+
+    /// > Requires Authentication
+    /// > Requires an unlocked vault
+    /// Deletes the send associated with the provided ID
+    ///
+    Delete(SendDeleteRequest),
+}
+
+#[cfg(feature = "internal")]
+#[derive(Serialize, Deserialize, JsonSchema, Debug)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub enum GeneratorCommand {
+    /// Generates a new password using the provided options
+    ///
+    /// Returns: String
+    ///
+    GeneratePassword(PasswordGeneratorRequest),
+
+    /// Lists all generated passwords saved in the history
+    ///
+    ListHistory(EmptyRequest),
+
+    /// Clears the generated password history
+    ///  
+    ClearHistory(EmptyRequest),
 }
