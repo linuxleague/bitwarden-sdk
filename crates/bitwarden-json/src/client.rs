@@ -44,16 +44,16 @@ impl Client {
 
         match cmd {
             #[cfg(feature = "internal")]
-            Command::PasswordLogin(req) => self.0.password_login(&req).await.into_string(),
-            Command::AccessTokenLogin(req) => self.0.access_token_login(&req).await.into_string(),
+            Command::PasswordLogin(req) => self.0.password_login(req).await.into_string(),
+            Command::AccessTokenLogin(req) => self.0.access_token_login(req).await.into_string(),
             #[cfg(feature = "internal")]
-            Command::GetUserApiKey(req) => self.0.get_user_api_key(&req).await.into_string(),
+            Command::GetUserApiKey(req) => self.0.get_user_api_key(req).await.into_string(),
             #[cfg(feature = "internal")]
-            Command::ApiKeyLogin(req) => self.0.api_key_login(&req).await.into_string(),
+            Command::ApiKeyLogin(req) => self.0.api_key_login(req).await.into_string(),
             #[cfg(feature = "internal")]
-            Command::Sync(req) => self.0.sync(&req).await.into_string(),
+            Command::Sync(req) => self.0.sync(req).await.into_string(),
             #[cfg(feature = "internal")]
-            Command::Fingerprint(req) => self.0.fingerprint(&req).into_string(),
+            Command::Fingerprint(req) => self.0.fingerprint(req).into_string(),
 
             Command::Secrets(cmd) => match cmd {
                 SecretsCommand::Get(req) => self.0.secrets().get(&req).await.into_string(),

@@ -7,6 +7,7 @@ use bitwarden_api_identity::apis::Error as IdentityError;
 use reqwest::StatusCode;
 use thiserror::Error;
 
+#[cfg_attr(feature = "use_uniffi", derive(uniffi::Error), uniffi(flat_error))]
 #[derive(Debug, Error)]
 pub enum Error {
     #[error("The client is not authenticated or the session has expired")]

@@ -300,7 +300,7 @@ async fn process_commands() -> Result<()> {
 
     // Load session or return if no session exists
     let _ = client
-        .access_token_login(&AccessTokenLoginRequest {
+        .access_token_login(AccessTokenLoginRequest {
             access_token: access_token,
         })
         .await?;

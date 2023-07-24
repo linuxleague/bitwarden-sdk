@@ -46,7 +46,9 @@
 //!     Ok(())
 //! }
 //! ```
-//!
+
+#[cfg(feature = "use_uniffi")]
+uniffi::setup_scaffolding!();
 
 pub mod auth;
 pub mod client;
@@ -55,6 +57,8 @@ pub mod error;
 #[cfg(feature = "internal")]
 pub mod platform;
 pub mod secrets_manager;
+#[cfg(feature = "use_uniffi")]
+mod uniffi_support;
 mod util;
 pub mod wordlist;
 

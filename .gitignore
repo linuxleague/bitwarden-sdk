@@ -30,7 +30,7 @@ crates/bitwarden-napi/sdk-napi.*.node
 crates/bitwarden-napi/dist
 
 # Uniffi
-crates/bitwarden-uniffi/bindings
+crates/bitwarden/bindings
 
 # Schemas
 support/schemas

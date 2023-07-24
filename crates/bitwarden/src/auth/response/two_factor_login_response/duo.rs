@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, JsonSchema)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
+#[cfg_attr(feature = "use_uniffi", derive(uniffi::Record))]
 pub struct Duo {
     pub host: String,
     pub signature: String,

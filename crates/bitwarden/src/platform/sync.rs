@@ -13,6 +13,7 @@ use crate::{
 
 #[derive(Serialize, Deserialize, Debug, JsonSchema)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
+#[cfg_attr(feature = "use_uniffi", derive(uniffi::Record))]
 pub struct SyncRequest {
     /// Exclude the subdomains from the response, defaults to false
     pub exclude_subdomains: Option<bool>,
@@ -41,6 +42,7 @@ pub(crate) async fn sync(client: &mut Client, input: &SyncRequest) -> Result<Syn
 
 #[derive(Serialize, Deserialize, Debug, JsonSchema)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
+#[cfg_attr(feature = "use_uniffi", derive(uniffi::Record))]
 pub struct ProfileResponse {
     pub id: Uuid,
     pub name: String,
@@ -53,16 +55,19 @@ pub struct ProfileResponse {
 
 #[derive(Serialize, Deserialize, Debug, JsonSchema)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
+#[cfg_attr(feature = "use_uniffi", derive(uniffi::Record))]
 pub struct ProfileOrganizationResponse {
     pub id: Uuid,
 }
 
 #[derive(Serialize, Deserialize, Debug, JsonSchema)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
+#[cfg_attr(feature = "use_uniffi", derive(uniffi::Record))]
 pub struct CipherDetailsResponse {}
 
 #[derive(Serialize, Deserialize, Debug, JsonSchema)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
+#[cfg_attr(feature = "use_uniffi", derive(uniffi::Record))]
 pub struct SyncResponse {
     /// Data about the user, including their encryption keys and the organizations they are a part of
     pub profile: ProfileResponse,

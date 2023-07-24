@@ -10,4 +10,4 @@ name = "uniffi-bindgen"
 path = "uniffi-bindgen.rs"
 
 [dependencies]
-uniffi = { version = "0.24.1", features = ["cli"] }
+uniffi = { git = "https://github.com/mozilla/uniffi-rs", rev = "826ea995960742d6b60449926fbfbb568f58a206", features = ["cli"] }

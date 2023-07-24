@@ -57,6 +57,7 @@ pub(crate) enum LoginMethod {
     },
 }
 
+#[cfg_attr(feature = "use_uniffi", derive(uniffi::Object))]
 #[derive(Debug)]
 pub struct Client {
     token: Option<String>,
@@ -73,6 +74,16 @@ pub struct Client {
     auth_settings: Option<AuthSettings>,
 
     encryption_settings: Option<EncryptionSettings>,
+}
+
+#[cfg(feature = "use_uniffi")]
+#[uniffi::export]
+impl Client {
+    // Uniffi requires the constructor of objects to return an Arc
+    #[uniffi::constructor]
+    pub fn new_arc(settings: Option<ClientSettings>) -> std::sync::Arc<Self> {
+        std::sync::Arc::new(Self::new(settings))
+    }
 }
 
 impl Client {
@@ -130,55 +141,9 @@ impl Client {
     }
 
     #[cfg(feature = "internal")]
-    pub async fn password_login(
-        &mut self,
-        input: &PasswordLoginRequest,
-    ) -> Result<PasswordLoginResponse> {
-        password_login(self, input).await
-    }
-
-    #[cfg(feature = "internal")]
-    pub async fn api_key_login(
-        &mut self,
-        input: &ApiKeyLoginRequest,
-    ) -> Result<ApiKeyLoginResponse> {
-        api_key_login(self, input).await
-    }
-
-    pub async fn access_token_login(
-        &mut self,
-        input: &AccessTokenLoginRequest,
-    ) -> Result<ApiKeyLoginResponse> {
-        access_token_login(self, input).await
-    }
-
-    #[cfg(feature = "internal")]
-    pub async fn sync(&mut self, input: &SyncRequest) -> Result<SyncResponse> {
-        sync(self, input).await
-    }
-
-    #[cfg(feature = "internal")]
-    pub async fn get_user_api_key(
-        &mut self,
-        input: &SecretVerificationRequest,
-    ) -> Result<UserApiKeyResponse> {
-        get_user_api_key(self, input).await
-    }
-
-    #[cfg(feature = "internal")]
     pub(crate) fn get_auth_settings(&self) -> &Option<AuthSettings> {
         &self.auth_settings
     }
-
-    pub fn get_access_token_organization(&self) -> Option<Uuid> {
-        match &self.login_method {
-            Some(LoginMethod::AccessToken {
-                organization_id, ..
-            }) => Some(*organization_id),
-            _ => None,
-        }
-    }
-
     pub(crate) fn get_encryption_settings(&self) -> &Option<EncryptionSettings> {
         &self.encryption_settings
     }
@@ -202,15 +167,6 @@ impl Client {
         self.login_method = Some(login_method);
         self.__api_configurations.identity.oauth_access_token = Some(token.clone());
         self.__api_configurations.api.oauth_access_token = Some(token);
-    }
-
-    pub async fn renew_token(&mut self) -> Result<()> {
-        renew_token(self).await
-    }
-
-    #[cfg(feature = "internal")]
-    pub fn is_authed(&self) -> bool {
-        self.token.is_some() || self.auth_settings.is_some()
     }
 
     #[cfg(feature = "internal")]
@@ -255,10 +211,70 @@ impl Client {
         enc.set_org_keys(org_keys)?;
         Ok(self.encryption_settings.as_ref().unwrap())
     }
+}
+
+#[cfg_attr(feature = "use_uniffi", uniffi::export)]
+impl Client {
+    #[cfg(feature = "internal")]
+    pub async fn password_login(
+        &self,
+        input: PasswordLoginRequest,
+    ) -> Result<PasswordLoginResponse> {
+        // password_login(self, &input).await
+        todo!()
+    }
 
     #[cfg(feature = "internal")]
-    pub fn fingerprint(&mut self, input: &FingerprintRequest) -> Result<String> {
-        generate_fingerprint(input)
+    pub async fn api_key_login(&self, input: ApiKeyLoginRequest) -> Result<ApiKeyLoginResponse> {
+        //api_key_login(self, &input).await
+        todo!()
+    }
+
+    pub async fn access_token_login(
+        &self,
+        input: AccessTokenLoginRequest,
+    ) -> Result<ApiKeyLoginResponse> {
+        //access_token_login(self, &input).await
+        todo!()
+    }
+
+    #[cfg(feature = "internal")]
+    pub async fn sync(&self, input: SyncRequest) -> Result<SyncResponse> {
+        // sync(self, &input).await
+        todo!()
+    }
+
+    #[cfg(feature = "internal")]
+    pub async fn get_user_api_key(
+        &self,
+        input: SecretVerificationRequest,
+    ) -> Result<UserApiKeyResponse> {
+        //  get_user_api_key(self, &input).await
+        todo!()
+    }
+
+    pub fn get_access_token_organization(&self) -> Option<Uuid> {
+        match &self.login_method {
+            Some(LoginMethod::AccessToken {
+                organization_id, ..
+            }) => Some(*organization_id),
+            _ => None,
+        }
+    }
+
+    pub async fn renew_token(&self) -> Result<()> {
+        //renew_token(self).await
+        todo!()
+    }
+
+    #[cfg(feature = "internal")]
+    pub fn is_authed(&self) -> bool {
+        self.token.is_some() || self.auth_settings.is_some()
+    }
+
+    #[cfg(feature = "internal")]
+    pub fn fingerprint(&self, input: FingerprintRequest) -> Result<String> {
+        generate_fingerprint(&input)
     }
 }
 
@@ -323,7 +339,7 @@ mod tests {
 
         // Test the login is correct and we store the returned organization ID correctly
         let res = client
-            .access_token_login(&AccessTokenLoginRequest {
+            .access_token_login(AccessTokenLoginRequest {
                 access_token: "0.ec2c1d46-6a4b-4751-a310-af9601317f2d.C2IgxjjLF7qSshsbwe8JGcbM075YXw:X8vbvA0bduihIDe/qrzIQQ==".into(),
             })
             .await

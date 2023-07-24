@@ -12,8 +12,13 @@ keywords = ["bitwarden", "secrets-manager"]
 edition = "2021"
 rust-version = "1.57"
 
+[lib]
+crate-type = ["lib", "cdylib"]
+
 [features]
 internal = [] # Internal testing methods
+
+use_uniffi = ["uniffi"]
 
 [dependencies]
 base64 = ">=0.21.2, <0.22"
@@ -42,9 +47,13 @@ rand = ">=0.8.5, <0.9"
 num-bigint = ">=0.4, <0.5"
 num-traits = ">=0.2.15, <0.3"
 uuid = { version = ">=1.3.3, <2.0", features = ["serde"] }
+uniffi = { git = "https://github.com/mozilla/uniffi-rs", rev = "826ea995960742d6b60449926fbfbb568f58a206", optional = true }
 
 # We don't use this directly (it's used by rand), but we need it here to enable WASM support
 getrandom = { version = ">=0.2.9", features = ["js"] }
+
+# TODO: Vendor OpenSSL
+openssl = { version = "0.10", features = ["vendored"] }
 
 bitwarden-api-identity = { path = "../bitwarden-api-identity", version = "0.2.0" }
 bitwarden-api-api = { path = "../bitwarden-api-api", version = "0.2.0" }

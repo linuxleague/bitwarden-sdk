@@ -8,6 +8,7 @@ use crate::auth::response::two_factor_login_response::{
 
 #[derive(Serialize, Deserialize, Debug, JsonSchema)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
+#[cfg_attr(feature = "use_uniffi", derive(uniffi::Record))]
 pub struct TwoFactorProviders {
     pub authenticator: Option<Authenticator>,
     /// Email 2fa
